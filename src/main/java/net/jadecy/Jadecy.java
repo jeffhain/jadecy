@@ -291,8 +291,6 @@ public class Jadecy {
     /**
      * Computes bulk dependencies, with byte sizes.
      * 
-     * Can use JadecyUtils.resBulkMergedLm(...) to simplify the result.
-     * 
      * The returned list always contains at least one map (step 0 map)
      * (which is consistent with ReachabilityComputer behavior).
      * 
@@ -344,10 +342,6 @@ public class Jadecy {
 
     /**
      * Computes dependencies as a graph.
-     * 
-     * Can use JadecyUtils.resGraphMergedLmml(...) and then JadecyUtils.resGraphCauselessMml(...),
-     * or JadecyUtils.resGraphCauselessLmml(...) and then JadecyUtils.resGraphMergedLml(...),
-     * or JadecyUtils.resGraphMergedAndCauselessLmml(...), to simplify the result.
      * 
      * @param elemType Type of elements to work on.
      * @param beginNameFilter Filter for names of elements which dependencies
