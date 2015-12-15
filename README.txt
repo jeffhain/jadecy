@@ -1,4 +1,13 @@
 ################################################################################
+Jadecy x.x, xxxx/xx/xx
+
+Changes since version 1.0:
+
+- Added tracking of src/build with git.
+
+- Javadoc cleanups.
+
+################################################################################
 Jadecy 1.0, 2015/12/13
 
 Jadecy stands for Java Dependencies and Cycles computer.
