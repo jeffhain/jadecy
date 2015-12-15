@@ -1,4 +1,11 @@
 ################################################################################
+Current dependencies:
+- src/main, src/build, src/samples:
+  - Java 5+
+- src/test:
+  - Java 8+
+  - JUnit 3.8.1 (under lib/junit.jar)
+################################################################################
 Jadecy x.x, xxxx/xx/xx
 
 Changes since version 1.0:
