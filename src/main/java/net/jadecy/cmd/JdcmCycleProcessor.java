@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2016 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,6 +89,8 @@ class JdcmCycleProcessor implements InterfaceCycleProcessor {
 
     private final HashMap<String,Long> countByCauseName = new HashMap<String,Long>();
 
+    private final int minSize;
+    
     /**
      * No limit if < 0.
      */
@@ -101,8 +103,8 @@ class JdcmCycleProcessor implements InterfaceCycleProcessor {
     //--------------------------------------------------------------------------
 
     /**
-     * @param maxCount Max number of cycles to process.
-     *        Must be >= 0, or < 0 in which case there is no limit.
+     * @param minSize Cycles of inferior size are ignored.
+     * @param maxCount Max number of cycles to process. If < 0, no limit.
      */
     public JdcmCycleProcessor(
             ElemType elemType,
@@ -110,12 +112,14 @@ class JdcmCycleProcessor implements InterfaceCycleProcessor {
             boolean mustPrintCauses,
             boolean mustUseDotFormat,
             PrintStream stream,
+            int minSize,
             long maxCount) {
         this.elemType = elemType;
         this.mustPrintOnProcess = mustPrintOnProcess;
         this.mustPrintCauses = mustPrintCauses;
         this.mustUseDotFormat = mustUseDotFormat;
         this.stream = stream;
+        this.minSize = minSize;
         this.maxCount = maxCount;
     }
     
@@ -132,6 +136,9 @@ class JdcmCycleProcessor implements InterfaceCycleProcessor {
             String[][] causesArr) {
         if (this.maxCount == 0) {
             return true;
+        }
+        if (names.length < this.minSize) {
+            return false;
         }
         this.count++;
         increment(this.countBySize, names.length);

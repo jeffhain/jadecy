@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2016 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import net.jadecy.JadecyUtilsTest;
 import net.jadecy.cmd.JdcmComp_CYCLES_Test;
 import net.jadecy.cmd.JdcmComp_DEPSOF_Test;
 import net.jadecy.cmd.JdcmComp_GDEPSTO_Test;
+import net.jadecy.cmd.JdcmComp_SCYCLES_Test;
 import net.jadecy.cmd.JdcmGeneralTest;
 import net.jadecy.cmd.JdcmComp_PATHSG_Test;
 import net.jadecy.cmd.JdcmComp_SCCS_Test;
@@ -46,6 +47,7 @@ import net.jadecy.graph.OneShortestPathComputerTest;
 import net.jadecy.graph.PathsGraphComputerTest;
 import net.jadecy.graph.ReachabilityComputerTest;
 import net.jadecy.graph.SccsComputerTest;
+import net.jadecy.graph.ShortestCyclesComputerTest;
 import net.jadecy.graph.SomeCyclesComputerTest;
 import net.jadecy.graph.WorkGraphUtilzTest;
 import net.jadecy.parsing.ClassDepsParserTest;
@@ -97,6 +99,7 @@ public class AllTests {
         suite.addTestSuite(JdcmComp_GDEPSTO_Test.class);
         suite.addTestSuite(JdcmComp_PATHSG_Test.class);
         suite.addTestSuite(JdcmComp_SCCS_Test.class);
+        suite.addTestSuite(JdcmComp_SCYCLES_Test.class);
         suite.addTestSuite(JdcmComp_SOME_CYCLES_Test.class);
         suite.addTestSuite(JdcmComp_SPATH_Test.class);
         suite.addTestSuite(JdcmErrorsTest.class);
@@ -125,6 +128,7 @@ public class AllTests {
         suite.addTestSuite(PathsGraphComputerTest.class);
         suite.addTestSuite(ReachabilityComputerTest.class);
         suite.addTestSuite(SccsComputerTest.class);
+        suite.addTestSuite(ShortestCyclesComputerTest.class);
         suite.addTestSuite(SomeCyclesComputerTest.class);
         suite.addTestSuite(WorkGraphUtilzTest.class);
 

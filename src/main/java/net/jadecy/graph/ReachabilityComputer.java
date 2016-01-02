@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2016 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package net.jadecy.graph;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -45,14 +46,15 @@ public class ReachabilityComputer {
     //--------------------------------------------------------------------------
     
     private static final Collection<InterfaceVertex> EMPTY_COLL =
-            new ArrayList<InterfaceVertex>(0);
+            Collections.unmodifiableCollection(new ArrayList<InterfaceVertex>(0));
 
     //--------------------------------------------------------------------------
     // PUBLIC METHODS
     //--------------------------------------------------------------------------
     
     /**
-     * Computes vertices that can be reached from a specified begin set.
+     * Computes vertices that can be reached from a specified collection of
+     * begin vertices.
      * 
      * For a same input, and regardless of vertices hash codes,
      * this method always produces the same output.
@@ -68,8 +70,7 @@ public class ReachabilityComputer {
      * For each step, calls to processor.processCollVertex(...) are ordered
      * according to vertices natural ordering.
      * 
-     * @param graph A graph.
-     * @param beginVertexFilter Filter to define begin vertices.
+     * @param beginVertexColl Collection of begin vertices.
      * @param mustIncludeBeginVertices If true, begin vertices are added
      *        into the processed ones even if never reached.
      * @param mustIncludeReachedBeginVertices If true, reached begin vertices

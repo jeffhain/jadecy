@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2016 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,8 @@ public interface InterfaceVertexCollProcessor {
      * which can be many (easy to bench the gain with a "ball" graph (all
      * vertices successors of each other) of size 8 (-> 16064 cycles) or more).
      * 
-     * For simplicity, we also use it for processing strongly connected
-     * components.
+     * For simplicity, we also use it for processing all vertices collections
+     * computed by graph algorithms of this package.
      */
     
     /**

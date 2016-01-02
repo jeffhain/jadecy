@@ -10,9 +10,35 @@ Jadecy x.x, xxxx/xx/xx
 
 Changes since version 1.0:
 
+- Added ShortestCyclesComputer, which computes shortest cycles covering all
+  edges of each SCC.
+  It uses the cycle detection algorithm described in the paper "Efficient
+  Retrieval and Ranking of Undesired Package Cycles in Large Software Systems",
+  by Jannik Laval, Jean-Remy Falleri, Philippe Vismara, and Stephane Ducasse
+  (cf. http://www.jot.fm/issues/issue_2012_04/article4.pdf),
+  modulo some optimizations that can greatly speed things up, for example in
+  case of a single but long cycle, and usually reduce the amount of cycles found
+  for covering SCCs edges.
+  This new algorithm makes SomeCyclesComputer, and maybe also CyclesComputer,
+  mostly obsolete in practice for hunting down cycles, since it's both fast and
+  covers all edges of SCCs.
+
+- Added Jadecy.computeShortestCycles(...).
+
+- Added DepUnit.checkShortestCycles(...), for user not having to explicitly
+  allow all actual acceptable cycles as with checkCycles(...) method.
+
+- For JadecyMain, added -scycles computation (for shortest cycles),
+  and -minsize option for SCCs and cycles.
+  
+- Added JadecyMain.runArgs(...), for flexible programmatic usage of JadecyMain.
+
+- Added JadecyMainSample and sample_scycles.bat.
+
 - Added tracking of src/build with git.
 
-- Javadoc cleanups.
+- Various javadoc, internal code and comments cleanups and improvements that
+  are not really worth mentioning.
 
 ################################################################################
 Jadecy 1.0, 2015/12/13

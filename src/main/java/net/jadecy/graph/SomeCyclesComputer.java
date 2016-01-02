@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2016 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,7 +114,8 @@ public class SomeCyclesComputer {
         ArgsUtils.requireNonNull(processor);
         
         // Implicit null check.
-        if (graph.size() == 0) {
+        if ((graph.size() == 0)
+                || (maxSize == 0)) {
             return;
         }
         

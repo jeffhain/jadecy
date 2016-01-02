@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2016 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -153,14 +153,14 @@ public class SomeCyclesComputerTest extends TestCase {
         final int graphSize = 5;
         final BallGraphGenerator gg = new BallGraphGenerator(SEED, graphSize);
         
-        // When max size growth, amount of cycles found for each size must not change,
+        // When max size grows, amount of cycles found for each size must not change,
         // else that would mean that some were screened out by some bug.
         Map<Integer,Integer> refCountBySize = null;
         
         for (int maxSize : new int[]{-1,0,1,2,3}) {
             final Collection<InterfaceVertex> graph = gg.newGraph();
-            final MyCycleComputerVcp processor = new MyCycleComputerVcp();
             
+            final MyCycleComputerVcp processor = new MyCycleComputerVcp();
             CyclesComputer.computeCycles(graph, maxSize, processor);
 
             final int expectedMaxSize = (maxSize < 0) ? graphSize : maxSize;
@@ -213,8 +213,8 @@ public class SomeCyclesComputerTest extends TestCase {
                 GraphTestsUtilz.LARGER_THAN_CALL_STACK);
         
         final Collection<InterfaceVertex> graph = gg.newGraph();
-        final MyCycleComputerVcp processor = new MyCycleComputerVcp();
         
+        final MyCycleComputerVcp processor = new MyCycleComputerVcp();
         SomeCyclesComputer.computeSomeCycles(graph, -1, processor);
         
         assertEquals(1, processor.cycleList.size());
@@ -278,7 +278,7 @@ public class SomeCyclesComputerTest extends TestCase {
             int maxSize) {
         
         if (DEBUG) {
-            System.out.println("test_computeSomeCycles_againstNaive(" + gg + "," + maxSize + ")");
+            System.out.println("test_computeSomeCycles_againstNaive(" + gg + ",maxSize=" + maxSize + ")");
         }
         
         final Collection<InterfaceVertex> graph = gg.newGraph();
@@ -287,41 +287,43 @@ public class SomeCyclesComputerTest extends TestCase {
             GraphTestsUtilz.printGraph(graph);
         }
         
-        final TreeSet<ComparableVertexArrayList> allNormalizedCycles;
+        final TreeSet<ComparableVertexArrayList> allCycles;
         {
             final MyCycleComputerVcp processor = new MyCycleComputerVcp();
             NaiveCyclesComputer.computeCycles(graph, maxSize, processor);
-            allNormalizedCycles = GraphTestsUtilz.toNormalizedCyclesAsLists(processor.cycleList);
+            allCycles = GraphTestsUtilz.toNormalizedCyclesAsLists(processor.cycleList);
+            
             // Only one call per cycle.
-            assertEquals(allNormalizedCycles.size(), processor.cycleList.size());
+            assertEquals(allCycles.size(), processor.cycleList.size());
 
             if (DEBUG) {
                 System.out.println();
-                System.out.println("expectedCycles:");
-                for (ComparableVertexArrayList cycle : allNormalizedCycles) {
+                System.out.println("allCycles:");
+                for (ComparableVertexArrayList cycle : allCycles) {
                     System.out.println(cycle);
                 }
             }
         }
         
-        final TreeSet<ComparableVertexArrayList> someNormalizedCycles;
+        final TreeSet<ComparableVertexArrayList> someCycles;
         {
             final MyCycleComputerVcp processor = new MyCycleComputerVcp();
             SomeCyclesComputer.computeSomeCycles(graph, maxSize, processor);
-            someNormalizedCycles = GraphTestsUtilz.toNormalizedCyclesAsLists(processor.cycleList);
+            someCycles = GraphTestsUtilz.toNormalizedCyclesAsLists(processor.cycleList);
+            
             // Only one call per cycle.
-            assertEquals(someNormalizedCycles.size(), processor.cycleList.size());
+            assertEquals(someCycles.size(), processor.cycleList.size());
 
             if (DEBUG) {
                 System.out.println();
-                System.out.println("actualCycles:");
-                for (ComparableVertexArrayList cycle : someNormalizedCycles) {
+                System.out.println("someCycles:");
+                for (ComparableVertexArrayList cycle : someCycles) {
                     System.out.println(cycle);
                 }
             }
         }
 
-        checkContained(allNormalizedCycles, someNormalizedCycles);
+        checkContained(allCycles, someCycles);
     }
     
     /*

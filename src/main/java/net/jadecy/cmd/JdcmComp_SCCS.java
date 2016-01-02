@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2016 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,16 +40,18 @@ class JdcmComp_SCCS {
          */
         
         final List<SortedMap<String,Long>> byteSizeByNameList;
-        if ((cmd.maxSize != 0) && (cmd.maxCount != 0)) {
+        if (JdcmUtils.notEmpty(cmd.minSize, cmd.maxSize)
+                && (cmd.maxCount != 0)) {
             final List<SortedMap<String,Long>> res = jdc.computeSccs(cmd.elemType);
             /*
              * Only keeping small enough SCCs.
              */
-            if (cmd.maxSize >= 0) {
-                // Only keeping small enough ones.
+            if ((cmd.minSize >= 2) || (cmd.maxSize >= 0)) {
+                // Only keeping properly sized ones.
                 byteSizeByNameList = new ArrayList<SortedMap<String,Long>>();
                 for (SortedMap<String,Long> scc : res) {
-                    if (scc.size() <= cmd.maxSize) {
+                    if ((scc.size() >= cmd.minSize)
+                            && ((cmd.maxSize < 0) || (scc.size() <= cmd.maxSize))) {
                         byteSizeByNameList.add(scc);
                     }
                 }

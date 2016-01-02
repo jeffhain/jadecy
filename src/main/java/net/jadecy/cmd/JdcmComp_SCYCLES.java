@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016 Jeff Hain
+ * Copyright 2016 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import java.io.PrintStream;
 
 import net.jadecy.Jadecy;
 
-class JdcmComp_SOMECYCLES {
+class JdcmComp_SCYCLES {
 
     //--------------------------------------------------------------------------
     // PUBLIC METHODS
@@ -47,7 +47,7 @@ class JdcmComp_SOMECYCLES {
                 cmd.maxCount);
         if (JdcmUtils.notEmpty(cmd.minSize, cmd.maxSize)
                 && (cmd.maxCount != 0)) {
-            jdc.computeSomeCycles(
+            jdc.computeShortestCycles(
                     cmd.elemType,
                     cmd.maxSize,
                     processor);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2016 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,17 +56,12 @@ class JdcmCommand {
     boolean steps = false;
     boolean incl = false;
     //
-    /**
-     * null by default to check for duplication.
+    /*
+     * nulls by default to check for duplications.
      */
     Integer maxSteps = null;
-    /**
-     * null by default to check for duplication.
-     */
+    Integer minSize = null;
     Integer maxSize = null;
-    /**
-     * null by default to check for duplication.
-     */
     Long maxCount = null;
     /**
      * For convenience, allowing usage with cases that make it useless or
@@ -104,6 +99,7 @@ class JdcmCommand {
                 + ", steps = " + steps
                 + ", incl = " + incl
                 + ", maxSteps = " + maxSteps
+                + ", minSize = " + minSize
                 + ", maxSize = " + maxSize
                 + ", maxCount = " + maxCount
                 + ", noCauses = " + noCauses
@@ -229,9 +225,19 @@ class JdcmCommand {
             return null;
         }
 
+        if ((cmd.minSize != null)
+                && (cmd.compType != JdcmCompType.SCCS)
+                && (cmd.compType != JdcmCompType.CYCLES)
+                && (cmd.compType != JdcmCompType.SCYCLES)
+                && (cmd.compType != JdcmCompType.SOMECYCLES)) {
+            printErrorOptionIncompatibleWithComputation(cmd, "minsize", stream);
+            return null;
+        }
+
         if ((cmd.maxSize != null)
                 && (cmd.compType != JdcmCompType.SCCS)
                 && (cmd.compType != JdcmCompType.CYCLES)
+                && (cmd.compType != JdcmCompType.SCYCLES)
                 && (cmd.compType != JdcmCompType.SOMECYCLES)) {
             printErrorOptionIncompatibleWithComputation(cmd, "maxsize", stream);
             return null;
@@ -240,6 +246,7 @@ class JdcmCommand {
         if ((cmd.maxCount != null)
                 && (cmd.compType != JdcmCompType.SCCS)
                 && (cmd.compType != JdcmCompType.CYCLES)
+                && (cmd.compType != JdcmCompType.SCYCLES)
                 && (cmd.compType != JdcmCompType.SOMECYCLES)) {
             printErrorOptionIncompatibleWithComputation(cmd, "maxcount", stream);
             return null;
@@ -251,6 +258,7 @@ class JdcmCommand {
                 && (cmd.compType != JdcmCompType.SPATH)
                 && (cmd.compType != JdcmCompType.PATHSG)
                 && (cmd.compType != JdcmCompType.CYCLES)
+                && (cmd.compType != JdcmCompType.SCYCLES)
                 && (cmd.compType != JdcmCompType.SOMECYCLES)) {
             printErrorOptionIncompatibleWithComputation(cmd, "nocauses", stream);
             return null;
@@ -262,6 +270,7 @@ class JdcmCommand {
                 && (cmd.compType != JdcmCompType.SPATH)
                 && (cmd.compType != JdcmCompType.PATHSG)
                 && (cmd.compType != JdcmCompType.CYCLES)
+                && (cmd.compType != JdcmCompType.SCYCLES)
                 && (cmd.compType != JdcmCompType.SOMECYCLES)) {
             printErrorOptionIncompatibleWithComputation(cmd, "dotformat", stream);
             return null;
@@ -274,6 +283,11 @@ class JdcmCommand {
         if (cmd.maxSteps == null) {
             // No limit.
             cmd.maxSteps = -1;
+        }
+        
+        if (cmd.minSize == null) {
+            // Getting rid of null.
+            cmd.minSize = 0;
         }
         
         if (cmd.maxSize == null) {
@@ -315,9 +329,10 @@ class JdcmCommand {
         appendLine(sb, "       [-spath <beginregex> <endregex>]");
         appendLine(sb, "       [-pathsg <beginregex> <endregex> [-maxsteps <signed_int_32>]]");
         //
-        appendLine(sb, "       [-sccs [-maxsize <signed_int_32>] [-maxcount <signed_int_64>]]");
-        appendLine(sb, "       [-cycles [-maxsize <signed_int_32>] [-maxcount <signed_int_64>]]");
-        appendLine(sb, "       [-somecycles [-maxsize <signed_int_32>] [-maxcount <signed_int_64>]]");
+        appendLine(sb, "       [-sccs [-minsize <signed_int_32>] [-maxsize <signed_int_32>] [-maxcount <signed_int_64>]]");
+        appendLine(sb, "       [-cycles [-minsize <signed_int_32>] [-maxsize <signed_int_32>] [-maxcount <signed_int_64>]]");
+        appendLine(sb, "       [-scycles [-minsize <signed_int_32>] [-maxsize <signed_int_32>] [-maxcount <signed_int_64>]]");
+        appendLine(sb, "       [-somecycles [-minsize <signed_int_32>] [-maxsize <signed_int_32>] [-maxcount <signed_int_64>]]");
         /*
          * Output options.
          */
@@ -406,11 +421,17 @@ class JdcmCommand {
         appendLine(sb, "    -cycles:");
         appendLine(sb, "        Computes all cycles, with classes causing dependencies if -packages option is used");
         appendLine(sb, "        and -dotformat is not.");
-        appendLine(sb, "        Can take ages for highly tangled code (cf. -somecycles).");
+        appendLine(sb, "        For highly tangled code, can take ages and compute huges amounts of cycles,");
+        appendLine(sb, "        such as you might want to use -scycles instead in practice.");
+        appendLine(sb, "    -scycles:");
+        appendLine(sb, "        Computes a set of cycles that cover all dependencies of each SCC, doing best");
+        appendLine(sb, "        effort in making this set and these cycles as small as possible, with classes");
+        appendLine(sb, "        causing dependencies if -packages option is used and -dotformat is not.");
         appendLine(sb, "    -somecycles:");
         appendLine(sb, "        Similar to -cycles, but typically only computes some cycles, quickly,");
         appendLine(sb, "        without spending ages in tangled code dependencies, and finds none only");
         appendLine(sb, "        if there is none.");
+        appendLine(sb, "        Mostly pointless in practice since the introduction of -scycles.");
         
         appendLine(sb, "");
         appendLine(sb, "  Options for -depsof and -gdepsof computations only:");
@@ -467,17 +488,24 @@ class JdcmCommand {
         appendLine(sb, "        A negative value corresponds to no limit.");
         
         appendLine(sb, "");
-        appendLine(sb, "  Options for -sccs, -cycles and -somecycles computations only:");
+        appendLine(sb, "  Options for -sccs, -cycles, -scycles and -somecycles computations only:");
         appendLine(sb, "");
         
+        appendLine(sb, "    -minsize <signed_int_32>:");
+        appendLine(sb, "        A signed 32 bits integer in decimal, being min size of SCCs for -sccs");
+        appendLine(sb, "        computation, and min size of cycles for -cycles, -scycles and -somecycles");
+        appendLine(sb, "        computations.");
+
         appendLine(sb, "    -maxsize <signed_int_32>:");
         appendLine(sb, "        A signed 32 bits integer in decimal, being max size of SCCs for -sccs");
-        appendLine(sb, "        computation, and max size of cycles for -cycles and -somecycles computations.");
+        appendLine(sb, "        computation, and max size of cycles for -cycles, -scycles and -somecycles");
+        appendLine(sb, "        computations.");
         appendLine(sb, "        A negative value corresponds to no limit.");
 
         appendLine(sb, "    -maxcount <signed_int_64>:");
         appendLine(sb, "        A signed 64 bits integer in decimal, being max number of SCCs for -sccs");
-        appendLine(sb, "        computation, and max number of cycles for -cycles and -somecycles computations.");
+        appendLine(sb, "        computation, and max number of cycles for -cycles, -scycles and -somecycles");
+        appendLine(sb, "        computations.");
         appendLine(sb, "        A negative value corresponds to no limit.");
 
         appendLine(sb, "");
@@ -505,8 +533,8 @@ class JdcmCommand {
         appendLine(sb, "        starting at 0 (for no edge traversal).");
         appendLine(sb, "        For -gdepsof and -gdepsto computations without -steps option, and for -spath");
         appendLine(sb, "        and -pathsg computations, there is only one digraph, named allsteps.");
-        appendLine(sb, "        For -cycles and -somecycles computations, there is one digraph per cycle,");
-        appendLine(sb, "        named cycle_<cycleNum>, <cycleNum> starting at 1.");
+        appendLine(sb, "        For -cycles, -scycles and -somecycles computations, there is one digraph per");
+        appendLine(sb, "        cycle, named cycle_<cycleNum>, <cycleNum> starting at 1.");
         appendLine(sb, "    -tofile <file_path>:");
         appendLine(sb, "        Causes the output to be put into the specified file, which is deleted");
         appendLine(sb, "        if it already exists. If cannot delete or create the file, outputs some");
@@ -655,6 +683,13 @@ class JdcmCommand {
             }
             command.compType = JdcmCompType.CYCLES;
             
+        } else if (option.equals("scycles")) {
+            if (command.compType != null) {
+                printErrorTwoComputations(command, option, stream);
+                return bad;
+            }
+            command.compType = JdcmCompType.SCYCLES;
+            
         } else if (option.equals("somecycles")) {
             if (command.compType != null) {
                 printErrorTwoComputations(command, option, stream);
@@ -757,6 +792,23 @@ class JdcmCommand {
              * 
              */
 
+        } else if (option.equals("minsize")) {
+            if (command.minSize != null) {
+                printErrorDuplication(option, stream);
+                return bad;
+            }
+            if (i >= args.length) {
+                printErrorNotEnoughArgs(option, 1, stream);
+                return bad;
+            }
+            final String intString = args[i++];
+            try {
+                command.minSize = Integer.valueOf(intString);
+            } catch (NumberFormatException e) {
+                stream.println("ERROR: " + e.getClass().getSimpleName() + " for " + intString);
+                return bad;
+            }
+            
         } else if (option.equals("maxsize")) {
             if (command.maxSize != null) {
                 printErrorDuplication(option, stream);

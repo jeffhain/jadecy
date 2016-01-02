@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2016 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,7 +100,7 @@ public class ClassData extends AbstractCodeData {
     /**
      * @return An unmodifiable view of the internal set, or an empty unmodifiable set.
      */
-    //@Override
+    @Override
     public Set<ClassData> successors() {
         return this.successorSetUnmod;
     }
@@ -108,6 +108,7 @@ public class ClassData extends AbstractCodeData {
     /**
      * @return An unmodifiable view of the internal set, or an empty unmodifiable set.
      */
+    @Override
     public Set<ClassData> predecessors() {
         return this.predecessorSetUnmod;
     }

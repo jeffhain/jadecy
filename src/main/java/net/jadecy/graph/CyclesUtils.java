@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2016 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ public class CyclesUtils {
      * @param cycle Cycle to be normalized.
      * @throws NullPointerException if cycle or any of its elements is null.
      */
-    public static <E extends Comparable<E>> void normalizeCycle(E[] cycle) {
+    public static <E extends Comparable<? super E>> void normalizeCycle(E[] cycle) {
         ArgsUtils.requireNonNull2(cycle);
         
         final int indexOfMin = computeIndexOfMin(cycle);
@@ -58,7 +58,7 @@ public class CyclesUtils {
      *        causes of the link to the next element (or previous for inverse dependencies).
      * @throws NullPointerException if any array or array element is null.
      */
-    public static <E extends Comparable<E>,C> void normalizeCycleWithCauses(
+    public static <E extends Comparable<? super E>,C> void normalizeCycleWithCauses(
             E[] cycle,
             C[][] causesArr) {
         ArgsUtils.requireNonNull2(cycle);
@@ -85,7 +85,7 @@ public class CyclesUtils {
      *        causes of the link to the next element (or previous for inverse dependencies).
      * @throws NullPointerException if any array or array element is null.
      */
-    public static <E extends Comparable<E>,C> void normalizeCycleAndCauses(
+    public static <E extends Comparable<? super E>,C> void normalizeCycleAndCauses(
             E[] cycle,
             C[][] causesArr) {
         normalizeCycleWithCauses(cycle, causesArr);
@@ -101,11 +101,11 @@ public class CyclesUtils {
     private CyclesUtils() {
     }
     
-    private static <E extends Comparable<E>> int computeIndexOfMin(E[] a) {
+    private static <E extends Comparable<? super E>> int computeIndexOfMin(E[] a) {
         E min = null;
         int minIndex = -1;
         for (int i = 0; i < a.length; i++) {
-            if ((min == null) || (((Comparable<E>) a[i]).compareTo(min) < 0)) {
+            if ((min == null) || (((Comparable<? super E>) a[i]).compareTo(min) < 0)) {
                 min = a[i];
                 minIndex = i;
             }

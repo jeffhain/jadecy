@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2016 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1589,9 +1589,6 @@ public class ClassDepsParser {
             long classVersion,
             String attrName) {
         final Long attrVersion = FIRST_VERSION_BY_ATTR_NAME.get(attrName);
-        if (attrVersion == null) {
-            return false;
-        }
         return (attrVersion != null)
                 && (classVersion >= attrVersion.longValue());
     }

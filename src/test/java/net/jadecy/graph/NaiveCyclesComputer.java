@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2016 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,7 +93,7 @@ class NaiveCyclesComputer {
             int j;
             {
                 final InterfaceVertex aFirst = a.get(i);
-                for (j=0;j<aSize;j++) {
+                for (j = 0; j < aSize; j++) {
                     final InterfaceVertex tmpBElement = b.get(j);
                     if (tmpBElement == aFirst) {
                         shift = j;

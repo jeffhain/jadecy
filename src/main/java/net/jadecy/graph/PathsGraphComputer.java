@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2016 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -124,12 +124,15 @@ public class PathsGraphComputer {
             return;
         }
         
-        // Computing a work graph, to have predecessors for going backward,
-        // and to be able to remove edges (successors).
-        // Using sorted collection for work graph for determinism
-        // (not done before for contains(...) performances).
+        /*
+         * Computing a work graph, to have predecessors for going backward,
+         * and to be able to remove edges.
+         * Using sorted collection for work graph for determinism
+         * (the set is not sorted for contains(...) performances).
+         */
+        
         final boolean mustIgnoreDeadEnds = false;
-        final TreeSet<WorkVertex> workGraph = WorkGraphUtilz.newWorkGraph(
+        final TreeSet<WorkVertex> workGraph = WorkGraphUtilz.newWorkGraphAsTreeSet(
                 SortUtils.toSortedList(beginSetReachability),
                 mustIgnoreDeadEnds);
         

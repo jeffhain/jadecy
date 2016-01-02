@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2016 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ import net.jadecy.graph.OneShortestPathComputer;
 import net.jadecy.graph.PathsGraphComputer;
 import net.jadecy.graph.ReachabilityComputer;
 import net.jadecy.graph.SccsComputer;
+import net.jadecy.graph.ShortestCyclesComputer;
 import net.jadecy.graph.SomeCyclesComputer;
 import net.jadecy.parsing.FsDepsParser;
 import net.jadecy.parsing.InterfaceDepsParser;
@@ -589,6 +590,9 @@ public class Jadecy {
      * The maxSize argument is especially useful for tangled code, for which
      * all cycles computation could easily take ages due to their insane amount.
      * 
+     * For highly tangled code as well, if not really looking for all cycles,
+     * you might want to use computeShortestCycles(...) instead in practice.
+     * 
      * @param elemType Type of elements to work on.
      * @param maxSize Max size of cycles to compute, possibly 0.
      *        If < 0, no limit.
@@ -602,6 +606,11 @@ public class Jadecy {
         
         ArgsUtils.requireNonNull(elemType);
         ArgsUtils.requireNonNull(processor);
+        
+        if (maxSize == 0) {
+            // Easy.
+            return;
+        }
         
         final PackageData defaultPackageData = this.computeDefaultPackageDataToUse();
         
@@ -623,12 +632,60 @@ public class Jadecy {
     }
     
     /**
+     * Computes a set of cycles that cover all dependencies of each SCC, doing
+     * best effort in making this set and these cycles as small as possible.
+     * 
+     * Never computes cycles of size 1 (since dependencies to self cannot be
+     * represented in the backing structures).
+     * 
+     * @param elemType Type of elements to work on.
+     * @param maxSize Max size of cycles to compute, possibly 0.
+     *        If < 0, no limit.
+     * @param processor Processor to process the cycles with.
+     * @throws NullPointerException if any argument is null.
+     */
+    public void computeShortestCycles(
+            ElemType elemType,
+            int maxSize,
+            InterfaceCycleProcessor processor) {
+        
+        ArgsUtils.requireNonNull(elemType);
+        ArgsUtils.requireNonNull(processor);
+
+        if (maxSize == 0) {
+            // Easy.
+            return;
+        }
+        
+        final PackageData defaultPackageData = this.computeDefaultPackageDataToUse();
+        
+        // Need to never filter out vertices here, else graph would not be
+        // consistent, i.e. would not contain vertices reachable from
+        // contained ones.
+        final Collection<InterfaceVertex> graph = computeVertexColl(
+                defaultPackageData,
+                elemType,
+                NameFilters.any());
+        
+        final JdcCycleVcp vcp = new JdcCycleVcp(
+                elemType,
+                processor);
+        ShortestCyclesComputer.computeShortestCycles(
+                graph,
+                maxSize,
+                vcp);
+    }
+
+    /**
      * Computes some cycles in parsed elements graph.
      * Computes none only if there is none, i.e. always finds at least one if
      * there are some.
      * 
      * Never computes cycles of size 1 (since dependencies to self cannot be
      * represented in the backing structures).
+     * 
+     * This method is mostly pointless in practice since the introduction of
+     * computeShortestCycles(...).
      * 
      * @param elemType Type of elements to work on.
      * @param maxSize Max size of cycles to compute, possibly 0.
@@ -644,6 +701,11 @@ public class Jadecy {
         ArgsUtils.requireNonNull(elemType);
         ArgsUtils.requireNonNull(processor);
 
+        if (maxSize == 0) {
+            // Easy.
+            return;
+        }
+        
         final PackageData defaultPackageData = this.computeDefaultPackageDataToUse();
         
         // Need to never filter out vertices here, else graph would not be

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2016 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ public class DepsTest extends TestCase {
      * Dependencies.
      */
     
-    public void testPackagesDeps_src() {
+    public void testPackagesDeps_main() {
         final DepUnit depUnit = newDepUnit(JdcTestCompHelper.MAIN_SRC_PATH);
         final ElemType elemType = ElemType.PACKAGE;
 
@@ -73,6 +73,7 @@ public class DepsTest extends TestCase {
                     NameFilters.equalsName("net.jadecy"),
                     NameFilters.startsWithName("net.jadecy.code"),
                     NameFilters.startsWithName("net.jadecy.parsing"),
+                    NameFilters.startsWithName("net.jadecy.utils"),
                 });
 
         depUnit.addAllowedDirectDeps(
@@ -88,20 +89,20 @@ public class DepsTest extends TestCase {
 
         depUnit.addAllowedDirectDeps(
                 elemType,
-                NameFilters.equalsName("net.jadecy.graph"),
+                NameFilters.equalsName("net.jadecy.comp"),
                 new InterfaceNameFilter[]{
                     NameFilters.startsWithName("java.lang"),
                     NameFilters.startsWithName("java.util"),
+                    NameFilters.startsWithName("java.io"),
                     NameFilters.startsWithName("net.jadecy.utils"),
                 });
 
         depUnit.addAllowedDirectDeps(
                 elemType,
-                NameFilters.equalsName("net.jadecy.helpers"),
+                NameFilters.equalsName("net.jadecy.graph"),
                 new InterfaceNameFilter[]{
                     NameFilters.startsWithName("java.lang"),
                     NameFilters.startsWithName("java.util"),
-                    NameFilters.startsWithName("java.io"),
                     NameFilters.startsWithName("net.jadecy.utils"),
                 });
 
@@ -152,7 +153,7 @@ public class DepsTest extends TestCase {
          * 
          */
         
-        depUnit.checkCycles(elemType);
+        depUnit.checkShortestCycles(elemType);
     }
     
     public void testPackagesCycles_all() {
@@ -167,7 +168,7 @@ public class DepsTest extends TestCase {
                         B.class.getPackage().getName(),
         });
         
-        depUnit.checkCycles(elemType);
+        depUnit.checkShortestCycles(elemType);
     }
     
     //--------------------------------------------------------------------------

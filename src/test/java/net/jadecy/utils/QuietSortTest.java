@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2016 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package net.jadecy.utils;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Random;
 
 import net.jadecy.utils.QuietSort;
@@ -33,7 +34,7 @@ public class QuietSortTest extends TestCase {
     // PUBLIC METHODS
     //--------------------------------------------------------------------------
     
-    public void test_sort_Object_2int_Comparator() {
+    public void test_sort_Object_2int() {
         
         /*
          * NPE
@@ -140,6 +141,38 @@ public class QuietSortTest extends TestCase {
             // More check in case JDK gets funny.
             checkSorted(actualArr, fromIndex, toIndex);
         }
+    }
+    
+    public void test_sort_Object_2int_Comparator() {
+        
+        /*
+         * Quick test, since much code is shared.
+         */
+
+        // For decreasing ordering.
+        final Comparator<Integer> comparator = new Comparator<Integer>() {
+            //@Override
+            public int compare(Integer i1, Integer i2) {
+                final int v1 = i1.intValue();
+                final int v2 = i2.intValue();
+                if (v1 < v2) {
+                    return 1;
+                } else if (v1 > v2) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            }
+        };
+        
+        // Some duplicates.
+        final Object[] arr = new Object[]{1, 2,3,4,5,2,3,5, 7};
+        
+        // Not sorting extremities.
+        QuietSort.sort(arr, 1, arr.length - 1, comparator);
+        
+        final Object[] expected = new Object[]{1, 5,5,4,3,3,2,2, 7};
+        assertEquals(Arrays.toString(expected), Arrays.toString(arr));
     }
 
     //--------------------------------------------------------------------------

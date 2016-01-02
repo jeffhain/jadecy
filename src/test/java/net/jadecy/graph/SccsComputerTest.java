@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2016 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -213,16 +213,15 @@ public class SccsComputerTest extends TestCase {
     }
 
     public void test_computeSccs_earlyStop() {
-        final List<InterfaceVertex> graph = new ArrayList<InterfaceVertex>();
-        final MySccComputerVcp processor = new MySccComputerVcp();
-        
         final int n = 123;
-        processor.nbrOfSccsUntilStop = n;
         
+        final List<InterfaceVertex> graph = new ArrayList<InterfaceVertex>();
         for (int i = 0; i < 2*n; i++) {
             GraphTestsUtilz.newInGraph(graph, (i+1));
         }
         
+        final MySccComputerVcp processor = new MySccComputerVcp();
+        processor.nbrOfSccsUntilStop = n;
         SccsComputer.computeSccs(
                 graph,
                 processor);

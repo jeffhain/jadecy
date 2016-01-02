@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2016 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,8 @@
  *   vertices to another.
  * - SccsComputer: Computes strongly connected components.
  * - CyclesComputer: Computes cycles.
+ * - ShortestCyclesComputer: Computes shortest cycles covering all edges of each
+ *   SCC.
  * - SomeCyclesComputer: Computes some cycles.
  */
 package net.jadecy.graph;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2016 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -401,6 +401,11 @@ public class DepUnit {
     }
 
     /**
+     * Checks allowed cycles against those computed by Jadecy.computeCycles(...),
+     * i.e. against all cycles: for highly tangled code, you might want to use
+     * checkShortestCycles(...) instead, or to only take sub-parts of your
+     * code base into account.
+     * 
      * @param elemType Type of elements to work on.
      * @throws NullPointerException if elemType is null.
      * @throws AssertionError if found non allowed cycles, after printing them
@@ -414,6 +419,29 @@ public class DepUnit {
         final int maxSize = -1;
         final MyCycleProcessor processor = new MyCycleProcessor(data);
         this.jadecy.computeCycles(elemType, maxSize, processor);
+        
+        if (processor.foundError) {
+            throw new AssertionError();
+        }
+    }
+
+    /**
+     * Checks allowed cycles against those computed by Jadecy.computeShortestCycles(...),
+     * i.e. against typically much less cycles than when using checkCycles(...).
+     * 
+     * @param elemType Type of elements to work on.
+     * @throws NullPointerException if elemType is null.
+     * @throws AssertionError if found non allowed shortest cycles, after
+     *         printing them to the stream.
+     */
+    public void checkShortestCycles(ElemType elemType) {
+        
+        // Implicit null check.
+        final MyElemTypeData data = this.dataByTypeOrdinal[elemType.ordinal()];
+        
+        final int maxSize = -1;
+        final MyCycleProcessor processor = new MyCycleProcessor(data);
+        this.jadecy.computeShortestCycles(elemType, maxSize, processor);
         
         if (processor.foundError) {
             throw new AssertionError();

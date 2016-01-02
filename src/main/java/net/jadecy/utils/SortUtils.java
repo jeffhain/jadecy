@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2016 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package net.jadecy.utils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -57,10 +58,25 @@ public class SortUtils {
      * @throws NullPointerException if the specified list is null.
      */
     public static <E> void sort(List<E> list) {
+        sort(list, null);
+    }
 
+    /**
+     * If the specified comparator is null, elements must be mutually
+     * comparable, which implies that they must not be null.
+     * If the specified comparator is not null, elements must be comparable
+     * with it.
+     * 
+     * @param list The list to sort.
+     * @param c Comparator to use. Can be null, in which case elements are
+     *        casted into Comparable for comparisons.
+     * @throws NullPointerException if the specified list is null.
+     */
+    public static <E> void sort(List<E> list, Comparator<? super E> c) {
+        
         // Implicit null check.
         final Object[] sortedArr = list.toArray();
-        QuietSort.sort(sortedArr, 0, sortedArr.length);
+        QuietSort.sort(sortedArr, 0, sortedArr.length, c);
         
         list.clear();
         for (Object obj : sortedArr) {

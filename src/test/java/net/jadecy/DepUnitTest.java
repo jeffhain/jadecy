@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2016 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,12 @@
 package net.jadecy;
 
 import java.io.File;
+import java.util.ArrayList;
 
+import net.jadecy.code.ClassData;
 import net.jadecy.code.InterfaceNameFilter;
 import net.jadecy.code.NameFilters;
+import net.jadecy.code.PackageData;
 import net.jadecy.parsing.InterfaceDepsParser;
 import net.jadecy.parsing.ParsingFilters;
 import net.jadecy.utils.MemPrintStream;
@@ -702,6 +705,108 @@ public class DepUnitTest extends AbstractVirtualCodeGraphTezt {
                     });
             
             depUnit.checkCycles(elemType);
+        }
+    }
+
+    /*
+     * Shortest cycles.
+     * 
+     * Quick tests, since cycles allowance logic is already tested along with
+     * checkCycles(...).
+     */
+    
+    public void test_checkShortestCycles_exceptions() {
+        final DepUnit depUnit = newDepUnit();
+
+        try {
+            depUnit.checkShortestCycles(null);
+            assertTrue(false);
+        } catch (NullPointerException e) {
+            // ok
+        }
+    }
+    
+    /*
+     * checkXxxCycles(...).
+     */
+
+    /**
+     * Checks that check methods use the proper cycles algorithm.
+     */
+    public void test_checkAllOrShortestCycles_computedCycles() {
+        final DepUnit depUnit = newDepUnit();
+        
+        /*
+         * Replacing all dependencies with a small "ball graph".
+         */
+        
+        {
+            final PackageData defaultP =
+                    depUnit.jadecy().parser().getDefaultPackageData();
+            
+            defaultP.clear();
+            
+            final int n = 3;
+            final ArrayList<ClassData> cList = new ArrayList<ClassData>();
+            for (int i = 0; i < n; i++) {
+                final ClassData cN = defaultP.getOrCreateClassData("c" + i);
+                cList.add(cN);
+            }
+            for (int i = 0; i < n; i++) {
+                final ClassData ci = cList.get(i);
+                for (int j = 0; j < n; j++) {
+                    if (j == i) {
+                        // Can't have dependency to self.
+                        continue;
+                    }
+                    final ClassData cj = cList.get(j);
+                    PackageData.ensureDependency(ci, cj);
+                }
+            }
+        }
+        
+        /*
+         * 
+         */
+        
+        final MemPrintStream stream = (MemPrintStream) depUnit.getPrintStream();
+        
+        for (boolean mustUseShortestCycles : new boolean[]{false,true}) {
+            
+            stream.clear();
+            
+            /*
+             * Running the check.
+             */
+            
+            try {
+                if (mustUseShortestCycles) {
+                    depUnit.checkShortestCycles(ElemType.CLASS);
+                } else {
+                    depUnit.checkCycles(ElemType.CLASS);
+                }
+                // Check must throw, since we didn't allow anything.
+                assertTrue(false);
+            } catch (AssertionError e) {
+                // ok
+            }
+            
+            /*
+             * Computing the number of (illegal) cycles reported.
+             */
+            
+            int nbrOfCycles = 0;
+            for (String line : stream.getLines()) {
+                if (line.startsWith("ERROR:")) {
+                    nbrOfCycles++;
+                }
+            }
+
+            if (mustUseShortestCycles) {
+                assertEquals(3, nbrOfCycles);
+            } else {
+                assertEquals(5, nbrOfCycles);
+            }
         }
     }
 

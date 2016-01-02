@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2016 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package net.jadecy.utils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -81,6 +82,39 @@ public class SortUtilsTest extends TestCase {
             list.add(3);
             SortUtils.sort(list);
             assertEquals("[1, 2, 3, 4]", list.toString());
+        }
+    }
+
+    public void test_sort_List_Comparator() {
+        
+        /*
+         * Quick test, since much code is shared.
+         */
+
+        // For decreasing ordering.
+        final Comparator<Integer> comparator = new Comparator<Integer>() {
+            //@Override
+            public int compare(Integer i1, Integer i2) {
+                final int v1 = i1.intValue();
+                final int v2 = i2.intValue();
+                if (v1 < v2) {
+                    return 1;
+                } else if (v1 > v2) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            }
+        };
+
+        {
+            final ArrayList<Integer> list = new ArrayList<Integer>();
+            list.add(2);
+            list.add(1);
+            list.add(4);
+            list.add(3);
+            SortUtils.sort(list, comparator);
+            assertEquals("[4, 3, 2, 1]", list.toString());
         }
     }
 

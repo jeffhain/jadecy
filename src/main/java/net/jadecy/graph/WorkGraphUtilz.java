@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2016 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package net.jadecy.graph;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
@@ -43,38 +42,27 @@ class WorkGraphUtilz {
      * or some of its vertices, in which case they just won't be included in
      * the created work graph.
      * 
+     * A vertex having only itself as successor is not considered a dead end
+     * (since it has a successor).
+     * 
      * @param graph Graph from which a work graph must be created.
      *        Must not contain duplicates (not checked).
      * @param mustIgnoreDeadEnds True if must ignore vertices that have no
      *        successor, recursively, false otherwise. Useful to build a reduced
      *        work graph for computing cycles or SCCs.
-     * @return A work graph corresponding to the specified graph.
+     * @return A work graph corresponding to the specified graph,
+     *         as a TreeSet.
      */
-    public static TreeSet<WorkVertex> newWorkGraph(
+    public static TreeSet<WorkVertex> newWorkGraphAsTreeSet(
             Collection<? extends InterfaceVertex> graph,
             boolean mustIgnoreDeadEnds) {
+        
+        // NB: Add into this set is in O(log(e)), but is particularly costly
+        // if graph is sorted, because then the tree gets balanced about
+        // at each add.
         final TreeSet<WorkVertex> workGraph = new TreeSet<WorkVertex>();
         
-        final HashSet<InterfaceVertex> unicitySet = new HashSet<InterfaceVertex>();
-        
-        int nextId = 1;
-        for (InterfaceVertex v : graph) {
-            if (!unicitySet.add(v)) {
-                // Duplicate.
-                continue;
-            }
-            if (mustIgnoreDeadEnds) {
-                if (v.successors().size() == 0) {
-                    // We do clean-up later anyway,
-                    // but doesn't hurt to ignore it here.
-                    continue;
-                }
-            }
-            final WorkVertex wv = new WorkVertex(v, nextId++);
-            workGraph.add(wv);
-        }
-        
-        computeSuccessorsAndPredecessors(workGraph);
+        createAndAddWorkVertices(graph, workGraph);
         
         if (mustIgnoreDeadEnds) {
             removeDeadEnds(workGraph);
@@ -83,6 +71,43 @@ class WorkGraphUtilz {
         return workGraph;
     }
 
+    /**
+     * Similar to newWorkGraphAsTreeSet(...,false), but in O(v+e*log(e))
+     * instead of O(v*log(v)+log(e)^2).
+     * 
+     * @param graph Graph from which a work graph must be created.
+     *        Must not contain duplicates (not checked).
+     * @return A work graph corresponding to the specified graph,
+     *         as an ArrayList.
+     */
+    public static ArrayList<WorkVertex> newWorkGraphAsArrayList(
+            Collection<? extends InterfaceVertex> graph) {
+        
+        final ArrayList<WorkVertex> workGraph = new ArrayList<WorkVertex>();
+        
+        createAndAddWorkVertices(graph, workGraph);
+        
+        return workGraph;
+    }
+
+    /**
+     * Removes the specified edge if it exists.
+     * 
+     * @return True if did remove the specified edge, false if it did not exist.
+     */
+    public static boolean removeEdge(
+            WorkVertex from,
+            WorkVertex to) {
+        final boolean didRemove = from.successors().remove(to);
+        if (didRemove) {
+            final boolean forCheck = to.predecessors().remove(from);
+            if (!forCheck) {
+                throw new AssertionError();
+            }
+        }
+        return didRemove;
+    }
+    
     /**
      * Removes the specified vertex from the specified graph collection, and if
      * it succeeds to, also from its graph structure.
@@ -170,7 +195,24 @@ class WorkGraphUtilz {
     private WorkGraphUtilz() {
     }
     
-    private static void computeSuccessorsAndPredecessors(TreeSet<WorkVertex> workGraph) {
+    /**
+     * Created and adds work vertices, with edges between them,
+     * into the specified collection.
+     */
+    private static void createAndAddWorkVertices(
+            Collection<? extends InterfaceVertex> graph,
+            Collection<WorkVertex> workGraph) {
+        
+        int nextId = 1;
+        for (InterfaceVertex v : graph) {
+            final WorkVertex wv = new WorkVertex(v, nextId++);
+            workGraph.add(wv);
+        }
+        
+        computeSuccessorsAndPredecessors(workGraph);
+    }
+
+    private static void computeSuccessorsAndPredecessors(Collection<WorkVertex> workGraph) {
         
         /*
          * Computing work vertex by backing vertex.
@@ -237,7 +279,7 @@ class WorkGraphUtilz {
          * Removing leaves and adding new ones, until none remains.
          */
 
-        while (leaves.size() > 0) {
+        while (leaves.size() != 0) {
             final WorkVertex leaf = leaves.remove(leaves.size()-1);
             
             // Removing leaf from graph collection.

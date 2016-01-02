@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2016 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,6 +92,151 @@ public class JdcmComp_SCCS_Test extends AbstractJdcmTezt {
      * Advanced computations (only testing with classes).
      */
 
+    public void test_classes_minsize() {
+        for (int minSize = -1; minSize <= 6; minSize++) {
+            final String[] args = getArgs("-sccs" + " -minsize " + minSize);
+
+            final MemPrintStream defaultStream = new MemPrintStream();
+            runArgsWithVirtualDeps(args, defaultStream);
+
+            final String[] expectedLines;
+            if (minSize <= 2) {
+                expectedLines = new String[]{
+                        "args: " + Arrays.toString(args),
+                        "",
+                        "SCC 1 (" + (C8BS + C9BS) + " bytes):",
+                        C8N + ": " + C8BS,
+                        C9N + ": " + C9BS,
+                        "",
+                        "SCC 2 (" + (C2BS + C4BS + C5BS + C6BS + C7BS) + " bytes):",
+                        C2N + ": " + C2BS,
+                        C4N + ": " + C4BS,
+                        C5N + ": " + C5BS,
+                        C6N + ": " + C6BS,
+                        C7N + ": " + C7BS,
+                        "",
+                        "number of SCCs by size (number of classes):",
+                        "2 : 1",
+                        "5 : 1",
+                        "",
+                        "number of SCCs found: 2",
+                        "",
+                        "total byte size: " + (C2BS + C4BS + C5BS + C6BS + C7BS + C8BS + C9BS),
+                };
+            } else if (minSize <= 5) {
+                expectedLines = new String[]{
+                        "args: " + Arrays.toString(args),
+                        "",
+                        "SCC 1 (" + (C2BS + C4BS + C5BS + C6BS + C7BS) + " bytes):",
+                        C2N + ": " + C2BS,
+                        C4N + ": " + C4BS,
+                        C5N + ": " + C5BS,
+                        C6N + ": " + C6BS,
+                        C7N + ": " + C7BS,
+                        "",
+                        "number of SCCs by size (number of classes):",
+                        "5 : 1",
+                        "",
+                        "number of SCCs found: 1",
+                        "",
+                        "total byte size: " + (C2BS + C4BS + C5BS + C6BS + C7BS),
+                };
+            } else {
+                expectedLines = new String[]{
+                        "args: " + Arrays.toString(args),
+                        "",
+                        "number of SCCs by size (number of classes):",
+                        "",
+                        "number of SCCs found: 0",
+                        "",
+                        "total byte size: 0",
+                };
+            }
+            checkEqual(expectedLines, defaultStream);
+        }
+    }
+    
+    public void test_classes_minsize_maxsize() {
+        for (int minSize = -1; minSize <= 6; minSize++) {
+            for (int maxSize = -1; maxSize <= 6; maxSize++) {
+                final String[] args = getArgs("-sccs" + " -minsize " + minSize + " -maxsize " + maxSize);
+
+                final MemPrintStream defaultStream = new MemPrintStream();
+                runArgsWithVirtualDeps(args, defaultStream);
+
+                final String[] expectedLines;
+                if ((minSize <= 2) && ((maxSize < 0) || (maxSize >= 5))) {
+                    expectedLines = new String[]{
+                            "args: " + Arrays.toString(args),
+                            "",
+                            "SCC 1 (" + (C8BS + C9BS) + " bytes):",
+                            C8N + ": " + C8BS,
+                            C9N + ": " + C9BS,
+                            "",
+                            "SCC 2 (" + (C2BS + C4BS + C5BS + C6BS + C7BS) + " bytes):",
+                            C2N + ": " + C2BS,
+                            C4N + ": " + C4BS,
+                            C5N + ": " + C5BS,
+                            C6N + ": " + C6BS,
+                            C7N + ": " + C7BS,
+                            "",
+                            "number of SCCs by size (number of classes):",
+                            "2 : 1",
+                            "5 : 1",
+                            "",
+                            "number of SCCs found: 2",
+                            "",
+                            "total byte size: " + (C2BS + C4BS + C5BS + C6BS + C7BS + C8BS + C9BS),
+                    };
+                } else if ((minSize <= 2) && ((maxSize >= 2) && (maxSize < 5))) {
+                    expectedLines = new String[]{
+                            "args: " + Arrays.toString(args),
+                            "",
+                            "SCC 1 (" + (C8BS + C9BS) + " bytes):",
+                            C8N + ": " + C8BS,
+                            C9N + ": " + C9BS,
+                            "",
+                            "number of SCCs by size (number of classes):",
+                            "2 : 1",
+                            "",
+                            "number of SCCs found: 1",
+                            "",
+                            "total byte size: " + (C8BS + C9BS),
+                    };
+                } else if ((minSize <= 5) && ((maxSize < 0) || (maxSize >= 5))) {
+                    expectedLines = new String[]{
+                            "args: " + Arrays.toString(args),
+                            "",
+                            "SCC 1 (" + (C2BS + C4BS + C5BS + C6BS + C7BS) + " bytes):",
+                            C2N + ": " + C2BS,
+                            C4N + ": " + C4BS,
+                            C5N + ": " + C5BS,
+                            C6N + ": " + C6BS,
+                            C7N + ": " + C7BS,
+                            "",
+                            "number of SCCs by size (number of classes):",
+                            "5 : 1",
+                            "",
+                            "number of SCCs found: 1",
+                            "",
+                            "total byte size: " + (C2BS + C4BS + C5BS + C6BS + C7BS),
+                    };
+                } else {
+                    expectedLines = new String[]{
+                            "args: " + Arrays.toString(args),
+                            "",
+                            "number of SCCs by size (number of classes):",
+                            "",
+                            "number of SCCs found: 0",
+                            "",
+                            "total byte size: 0",
+                    };
+                }
+                checkEqual(expectedLines, defaultStream);
+            }
+        }
+    }
+    
     public void test_classes_maxsize_noOrHugeLimit() {
         for (int maxSize : new int[]{-1,Integer.MAX_VALUE}) {
             final String[] args = getArgs("-sccs" + " -maxsize " + maxSize);

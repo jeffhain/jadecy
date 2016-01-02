@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2016 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,8 @@ public class CyclesComputer {
 
     /*
      * Uses Donald B. Johnson's algorithm, with some pre-treatment to handle
-     * cycles of size 1.
+     * cycles of size 1, and possibility to ignore cycles above a certain size,
+     * which allows for faster execution.
      * 
      * n = vertices (nodes)
      * e = edges (arcs)
@@ -232,11 +233,20 @@ public class CyclesComputer {
      *        vertices reachable from contained ones.
      * @param maxSize Max size of processed cycles. If < 0, no limit.
      * @param processor Processor to process the cycles with.
+     * @throws NullPointerException if any argument is null.
      */
     public static void computeCycles(
             Collection<? extends InterfaceVertex> graph,
             int maxSize,
             InterfaceVertexCollProcessor processor) {
+
+        ArgsUtils.requireNonNull(processor);
+        
+        // Implicit null check.
+        if ((graph.size() == 0)
+                || (maxSize == 0)) {
+            return;
+        }
 
         /*
          * We create a work copy of the input graph, so that we can modify that
@@ -250,37 +260,32 @@ public class CyclesComputer {
          * resulting sub-graph.
          */
 
-        ArgsUtils.requireNonNull(processor);
-        
-        // Implicit null check.
-        if (graph.size() == 0) {
-            return;
-        }
-
         final boolean mustIgnoreDeadEnds = true;
-        final TreeSet<WorkVertex> workGraph = WorkGraphUtilz.newWorkGraph(
+        final TreeSet<WorkVertex> workGraph = WorkGraphUtilz.newWorkGraphAsTreeSet(
                 graph,
                 mustIgnoreDeadEnds);
         if (workGraph.size() == 0) {
+            // Can happen in case of dead ends removal.
             return;
         }
         
+        // Taking care of (v,v) elementary circuits, which are not handled
+        // by Johnson's algorithms, and removing them.
         for (WorkVertex v : workGraph) {
-            v.setData(new MyVertexData());
-            
-            // Taking care of (v,v) elementary circuits, which are not handled
-            // by Johnson's algorithms.
-            if (v.successors().remove(v)) {
-                final boolean forCheck = v.predecessors().remove(v);
-                if (!forCheck) {
-                    throw new AssertionError();
-                }
-                if (maxSize != 0) {
-                    if (processOneVertexCycle(v, processor)) {
-                        return;
-                    }
+            if (WorkGraphUtilz.removeEdge(v, v)) {
+                if (processOneVertexCycle(v, processor)) {
+                    return;
                 }
             }
+        }
+        
+        if (maxSize == 1) {
+            // No need to go further here.
+            return;
+        }
+
+        for (WorkVertex v : workGraph) {
+            v.setData(new MyVertexData());
         }
 
         final ArrayList<WorkVertex> stack = new ArrayList<WorkVertex>();
@@ -307,7 +312,8 @@ public class CyclesComputer {
         final ArrayList<MyCircuitContinuation> circuitContinuations = (USE_CONTINUATION ? new ArrayList<MyCircuitContinuation>() : null);
         final ArrayList<MyUnblockContinuation> unblockContinuations = (USE_CONTINUATION ? new ArrayList<MyUnblockContinuation>() : null);
 
-        while (sccSortedSet.size() != 0) {            
+        while (sccSortedSet.size() != 0) {
+            
             /*
              * Here, the paper says:
              * "Ak = adjacency structure of strong component K
@@ -478,7 +484,7 @@ public class CyclesComputer {
             System.out.println(prefix + "CIRCUIT_recursive(,,s = " + s + ", v = " + v + ",,)");
         }
         
-        // Max size handling: not in paper algo.
+        // Modif/paper: max size handling.
         if ((maxSize >= 0) && (stack.size() == maxSize)) {
             // Further cycle would be too large.
             if (DEBUG) {

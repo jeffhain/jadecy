@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2016 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,12 +68,12 @@ class WorkVertex implements InterfaceVertex {
     
     @Override
     public String toString() {
-        return "(id=" + this.id + ")" + this.backingVertex.toString();
+        return "(id=" + this.id + ")" + this.backingVertex;
     }
     
     //@Override
     public int compareTo(InterfaceVertex other) {
-        final WorkVertex ozer = (WorkVertex)other;
+        final WorkVertex ozer = (WorkVertex) other;
         // Our ids are >= 0.
         return this.id - ozer.id;
     }
@@ -113,4 +113,3 @@ class WorkVertex implements InterfaceVertex {
         return this.data;
     }
 }
-

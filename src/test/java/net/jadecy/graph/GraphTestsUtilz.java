@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2016 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -235,9 +235,15 @@ class GraphTestsUtilz {
         private final long seed;
         private final int size;
         private final TreeSet<ComparableVertexTreeSet> expectedSccs = new TreeSet<ComparableVertexTreeSet>();
+        /**
+         * @param size Must be >= 0.
+         */
         public DisconnectedGraphGenerator(
                 long seed,
                 int size) {
+            if (size < 0) {
+                throw new IllegalArgumentException("" + size);
+            }
             this.seed = seed;
             this.size = size;
         }
@@ -254,7 +260,7 @@ class GraphTestsUtilz {
 
             this.expectedSccs.clear();
 
-            for (int i = 0; i < size; i++) {
+            for (int i = 0; i < this.size; i++) {
                 int id = idGenerator.nextId();
                 Vertex v = newInGraph(graph, id);
 
@@ -280,9 +286,15 @@ class GraphTestsUtilz {
         private final long seed;
         private final int size;
         private final TreeSet<ComparableVertexTreeSet> expectedSccs = new TreeSet<ComparableVertexTreeSet>();
+        /**
+         * @param size Must be >= 0.
+         */
         public ChainGraphGenerator(
                 long seed,
                 int size) {
+            if (size < 0) {
+                throw new IllegalArgumentException("" + size);
+            }
             this.seed = seed;
             this.size = size;
         }
@@ -300,7 +312,7 @@ class GraphTestsUtilz {
             this.expectedSccs.clear();
 
             Vertex prevV = null;
-            for (int i = 0; i < size; i++) {
+            for (int i = 0; i < this.size; i++) {
                 int id = idGenerator.nextId();
                 Vertex v = newInGraph(graph, id);
                 if (prevV != null) {
@@ -425,9 +437,15 @@ class GraphTestsUtilz {
         private final long seed;
         private final int size;
         private final TreeSet<ComparableVertexTreeSet> expectedSccs = new TreeSet<ComparableVertexTreeSet>();
+        /**
+         * @param size Must be >= 0.
+         */
         public CycleGraphGenerator(
                 long seed,
                 int size) {
+            if (size < 0) {
+                throw new IllegalArgumentException("" + size);
+            }
             this.seed = seed;
             this.size = size;
         }
@@ -444,22 +462,24 @@ class GraphTestsUtilz {
 
             this.expectedSccs.clear();
 
-            Vertex initialV = null;
-            Vertex prevV = null;
-            for (int i = 0; i < size; i++) {
-                int id = idGenerator.nextId();
-                Vertex v = newInGraph(graph, id);
-                if (initialV == null) {
-                    initialV = v;
+            if (this.size != 0) {
+                Vertex initialV = null;
+                Vertex prevV = null;
+                for (int i = 0; i < this.size; i++) {
+                    int id = idGenerator.nextId();
+                    Vertex v = newInGraph(graph, id);
+                    if (initialV == null) {
+                        initialV = v;
+                    }
+                    if (prevV != null) {
+                        prevV.successors().add(v);
+                    }
+                    prevV = v;
                 }
-                if (prevV != null) {
-                    prevV.successors().add(v);
-                }
-                prevV = v;
-            }
 
-            if (ONE_VERTEX_CYCLES_ALLOWED || (this.size > 1)) {
-                prevV.successors().add(initialV);
+                if (ONE_VERTEX_CYCLES_ALLOWED || (this.size > 1)) {
+                    prevV.successors().add(initialV);
+                }
             }
 
             this.expectedSccs.add(new ComparableVertexTreeSet(graph));
@@ -479,9 +499,15 @@ class GraphTestsUtilz {
         private final long seed;
         private final int size;
         private final TreeSet<ComparableVertexTreeSet> expectedSccs = new TreeSet<ComparableVertexTreeSet>();
+        /**
+         * @param size Must be >= 0.
+         */
         public RakeCycleGraphGenerator(
                 long seed,
                 int size) {
+            if (size < 0) {
+                throw new IllegalArgumentException("" + size);
+            }
             this.seed = seed;
             this.size = size;
         }
@@ -498,24 +524,26 @@ class GraphTestsUtilz {
 
             this.expectedSccs.clear();
 
-            Vertex initialV = null;
-            Vertex prevV = null;
-            for (int i = 0; i < size; i++) {
-                int id = idGenerator.nextId();
-                Vertex v = newInGraph(graph, id);
-                if (initialV == null) {
-                    initialV = v;
-                } else {
-                    initialV.successors().add(v);
+            if (this.size != 0) {
+                Vertex initialV = null;
+                Vertex prevV = null;
+                for (int i = 0; i < this.size; i++) {
+                    int id = idGenerator.nextId();
+                    Vertex v = newInGraph(graph, id);
+                    if (initialV == null) {
+                        initialV = v;
+                    } else {
+                        initialV.successors().add(v);
+                    }
+                    if (prevV != null) {
+                        prevV.successors().add(v);
+                    }
+                    prevV = v;
                 }
-                if (prevV != null) {
-                    prevV.successors().add(v);
-                }
-                prevV = v;
-            }
 
-            if (ONE_VERTEX_CYCLES_ALLOWED || (this.size > 1)) {
-                prevV.successors().add(initialV);
+                if (ONE_VERTEX_CYCLES_ALLOWED || (this.size > 1)) {
+                    prevV.successors().add(initialV);
+                }
             }
 
             this.expectedSccs.add(new ComparableVertexTreeSet(graph));
@@ -530,15 +558,21 @@ class GraphTestsUtilz {
 
     /**
      * Generates graphs in which each vertex has all vertices (including itself)
-     * as both predecessors and successors.
+     * as successors (and therefore also as predecessors).
      */
     public static class BallGraphGenerator implements InterfaceGraphGenerator {
         private final long seed;
         private final int size;
         private final TreeSet<ComparableVertexTreeSet> expectedSccs = new TreeSet<ComparableVertexTreeSet>();
+        /**
+         * @param size Must be >= 0.
+         */
         public BallGraphGenerator(
                 long seed,
                 int size) {
+            if (size < 0) {
+                throw new IllegalArgumentException("" + size);
+            }
             this.seed = seed;
             this.size = size;
         }
@@ -555,7 +589,7 @@ class GraphTestsUtilz {
 
             this.expectedSccs.clear();
 
-            for (int i = 0; i < size; i++) {
+            for (int i = 0; i < this.size; i++) {
                 int id = idGenerator.nextId();
                 Vertex v = newInGraph(graph, id);
                 for (InterfaceVertex _w : graph) {
@@ -578,21 +612,28 @@ class GraphTestsUtilz {
     }
 
     /**
-     * Generates graph with 0 or more vertices, and from 0 to 2 successors
-     * for each vertex.
+     * Generates graph with 0 or more vertices, and from 0 to 3 successors
+     * for each vertex (3 should be enough to trigger all messy cases).
      */
     public static class RandomGraphGenerator implements InterfaceGraphGenerator {
         private final long seed;
         private final int maxSize;
+        /**
+         * @param maxSize Must be >= 0.
+         */
         public RandomGraphGenerator(
                 long seed,
                 int maxSize) {
+            if (maxSize < 0) {
+                throw new IllegalArgumentException("" + maxSize);
+            }
             this.seed = seed;
             this.maxSize = maxSize;
         }
         /**
          * @throws UnsupportedOperationException
          */
+        //@Override
         public TreeSet<ComparableVertexTreeSet> getExpectedSccs() {
             throw new UnsupportedOperationException();
         }
@@ -619,18 +660,25 @@ class GraphTestsUtilz {
             }
             
             /*
-             * Creating random edges.
+             * Creating random edges, between different vertices.
              */
             
             for (int i = 0; i < size; i++) {
                 final Vertex v = (Vertex) graph.get(i);
-                // 0..2
-                final int nbrOfSucc = random.nextInt(3);
-                for (int j = 0; j < nbrOfSucc; j++) {
+                
+                // size - 1, because don't want itself as successor.
+                final int maxNbrOfSucc = Math.min(3, size - 1);
+                final int nbrOfSucc = random.nextInt(maxNbrOfSucc + 1);
+                
+                int succCount = 0;
+                while (succCount < nbrOfSucc) {
                     final int succIndex = random.nextInt(size);
                     if (succIndex != i) {
                         final Vertex succ = (Vertex) graph.get(succIndex);
-                        v.successors().add(succ);
+                        final boolean didAdd = v.successors().add(succ);
+                        if (didAdd) {
+                            succCount++;
+                        }
                     }
                 }
             }
@@ -648,10 +696,20 @@ class GraphTestsUtilz {
         private final int nbrOfSccs;
         private final int maxSccSize;
         private final TreeSet<ComparableVertexTreeSet> expectedSccs = new TreeSet<ComparableVertexTreeSet>();
+        /**
+         * @param nbrOfSccs Must be >= 0.
+         * @param maxSccSize Must be > 0.
+         */
         public RandomGraphWithSccsGenerator(
                 long seed,
                 int nbrOfSccs,
                 int maxSccSize) {
+            if (nbrOfSccs < 0) {
+                throw new IllegalArgumentException("" + nbrOfSccs);
+            }
+            if (maxSccSize <= 0) {
+                throw new IllegalArgumentException("" + maxSccSize);
+            }
             this.seed = seed;
             this.nbrOfSccs = nbrOfSccs;
             this.maxSccSize = maxSccSize;
@@ -662,6 +720,7 @@ class GraphTestsUtilz {
          * 
          * @return Set of expected SCCs, updated on each generation.
          */
+        //@Override
         public TreeSet<ComparableVertexTreeSet> getExpectedSccs() {
             return this.expectedSccs;
         }
@@ -816,7 +875,7 @@ class GraphTestsUtilz {
 
     /**
      * For work vertices to have same ids than their backing vertices (when
-     * using WorkGraphUtilz.newWorkGraph(...)), the definition of vertices ids
+     * using WorkGraphUtilz.newWorkGraphXxx(...)), the definition of vertices ids
      * (but not of their successors) must start at 1, and increase by 1 for each
      * new vertex.
      * 
@@ -897,7 +956,7 @@ class GraphTestsUtilz {
         }
     }
 
-    public static void printGraph(Collection<InterfaceVertex> graph) {
+    public static void printGraph(Collection<? extends InterfaceVertex> graph) {
         System.out.println("graph:");
         for (InterfaceVertex v : graph) {
             System.out.print("v = " + v + ", successors = {");

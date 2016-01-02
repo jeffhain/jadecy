@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2016 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package net.jadecy.utils;
 
-
+import java.util.Comparator;
 
 /**
  * Sort for not using JDK sort, because it doesn't guard against quadratic worst
@@ -46,15 +46,17 @@ class QuietSort  {
          * @param minIndex Inclusive.
          * @param maxIndex Inclusive.
          */
-        public static void sort(Object[] a, int minIndex, int maxIndex) {
+        public static void sort(
+                Object[] a,
+                int minIndex,
+                int maxIndex,
+                Comparator<Object> c) {
             Object tmp;
             int j;
             for (int i = minIndex+1; i <= maxIndex; i++) {
                 tmp = a[i];
-                @SuppressWarnings("unchecked")
-                final Comparable<Object> tmpC = (Comparable<Object>) tmp;
                 j = i-1;
-                while ((j >= minIndex) && (tmpC.compareTo(a[j]) < 0)) {
+                while ((j >= minIndex) && (compare(tmp, a[j], c) < 0)) {
                     // j+1 evaluated before j--
                     a[j+1] = a[j--];
                 }
@@ -68,38 +70,43 @@ class QuietSort  {
          * @param minIndex Inclusive.
          * @param maxIndex Inclusive.
          */
-        public static void sort(Object[] a, int minIndex, int maxIndex) {
+        public static void sort(
+                Object[] a,
+                int minIndex,
+                int maxIndex,
+                Comparator<Object> c) {
             int n = maxIndex - minIndex + 1;
             Object tmp;
             
             // Building the heap.
             for (int v=(n>>1); --v >= 0;) {
-                downheap(a, n, v, minIndex);
+                downheap(a, n, v, minIndex, c);
             }
             
             while (n-- > 1) {
                 tmp = a[minIndex];
                 a[minIndex] = a[minIndex+n];
                 a[minIndex+n] = tmp;
-                downheap(a, n, 0, minIndex);
+                downheap(a, n, 0, minIndex, c);
             } 
         }
-        private static void downheap(Object[] a, int n, int v, int minIndex) {
+        private static void downheap(
+                Object[] a,
+                int n,
+                int v,
+                int minIndex,
+                Comparator<Object> c) {
             int w = (v<<1) + 1;
             int wm = w + minIndex;
             int vm = v + minIndex;
             int nm = n + minIndex;
             while (wm < nm) {
                 if (wm+1 < nm) {
-                    @SuppressWarnings("unchecked")
-                    final Comparable<Object> awmC = (Comparable<Object>) a[wm];
-                    if (awmC.compareTo(a[wm+1]) < 0) {
+                    if (compare(a[wm], a[wm+1], c) < 0) {
                         wm++;
                     }
                 }
-                @SuppressWarnings("unchecked")
-                final Comparable<Object> awmC = (Comparable<Object>) a[wm];
-                if (awmC.compareTo(a[vm]) <= 0) {
+                if (compare(a[wm], a[vm], c) <= 0) {
                     break;
                 }
                 Object tmp;
@@ -117,10 +124,12 @@ class QuietSort  {
     //--------------------------------------------------------------------------
     // PUBLIC METHODS
     //--------------------------------------------------------------------------
-    
+
     /**
-     * Elements must be mutually comparable, which implies that they must not be
-     * null.
+     * Equivalent to sort(,,,null).
+     * 
+     * Elements must be mutually comparable, which implies that they must not
+     * be null.
      * 
      * Not stable, but has no down side if two elements never compare to 0.
      * 
@@ -132,13 +141,46 @@ class QuietSort  {
      * @throws ArrayIndexOutOfBoundsException if fromIndex < 0 or
      *         toIndex > a.length.
      */
-    public static void sort(Object[] a, int fromIndex, int toIndex) {
-        rangeCheck(a.length, fromIndex, toIndex);
+    public static void sort(
+            Object[] a,
+            int fromIndex,
+            int toIndex) {
+        sort(a, fromIndex, toIndex, null);
+    }
+
+    /**
+     * If the specified comparator is null, elements must be mutually
+     * comparable, which implies that they must not be null.
+     * If the specified comparator is not null, elements must be comparable
+     * with it.
+     * 
+     * Not stable, but has no down side if two elements never compare to 0.
+     * 
+     * @param a Must not be null.
+     * @param fromIndex Inclusive.
+     * @param toIndex Exclusive.
+     * @param c Comparator to use. Can be null, in which case elements are
+     *        casted into Comparable for comparisons.
+     * @throws NullPointerException if the specified array is null.
+     * @throws IllegalArgumentException if fromIndex > toIndex.
+     * @throws ArrayIndexOutOfBoundsException if fromIndex < 0 or
+     *         toIndex > a.length.
+     */
+    public static void sort(
+            Object[] a,
+            int fromIndex,
+            int toIndex,
+            Comparator<?> c) {
         
+        rangeCheck(a.length, fromIndex, toIndex);
+
+        @SuppressWarnings("unchecked")
+        final Comparator<Object> cObj = (Comparator<Object>) c;
+
         if (toIndex - fromIndex <= MAX_SIZE_FOR_INSERTION_SORT) {
-            InsertionSort.sort(a, fromIndex, toIndex - 1);
+            InsertionSort.sort(a, fromIndex, toIndex - 1, cObj);
         } else {
-            HeapSort.sort(a, fromIndex, toIndex - 1);
+            HeapSort.sort(a, fromIndex, toIndex - 1, cObj);
         }
     }
     
@@ -159,6 +201,16 @@ class QuietSort  {
         }
         if (toIndex > arrayLength) {
             throw new ArrayIndexOutOfBoundsException(toIndex);
+        }
+    }
+    
+    private static int compare(Object o1, Object o2, Comparator<Object> c) {
+        if (c != null) {
+            return c.compare(o1, o2);
+        } else {
+            @SuppressWarnings("unchecked")
+            final Comparable<Object> o1C = (Comparable<Object>) o1;
+            return o1C.compareTo(o2);
         }
     }
 }

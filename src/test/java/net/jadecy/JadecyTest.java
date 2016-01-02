@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2016 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -861,7 +861,7 @@ public class JadecyTest extends AbstractVirtualCodeGraphTezt {
      * 
      */
 
-    public void test_computeOneShortestPath_exception() {
+    public void test_computeOneShortestPath_exceptions() {
         final Jadecy jdc = newJadecy();
 
         try {
@@ -1096,7 +1096,7 @@ public class JadecyTest extends AbstractVirtualCodeGraphTezt {
      * 
      */
 
-    public void test_computePathsGraph_exception() {
+    public void test_computePathsGraph_exceptions() {
         final Jadecy jdc = newJadecy();
 
         final int maxSteps = -1;
@@ -1401,7 +1401,7 @@ public class JadecyTest extends AbstractVirtualCodeGraphTezt {
      * 
      */
 
-    public void test_computeSccs_exception() {
+    public void test_computeSccs_exceptions() {
         final Jadecy jdc = newJadecy();
 
         try {
@@ -1431,6 +1431,12 @@ public class JadecyTest extends AbstractVirtualCodeGraphTezt {
         final Jadecy jdc = newJadecy();
 
         for (boolean withTopLevel : new boolean[]{false,true}) {
+            
+            if (DEBUG) {
+                System.out.println();
+                System.out.println("withTopLevel = " + withTopLevel);
+            }
+
             final PackageData defaultP = jdc.parser().getDefaultPackageData();
             defaultP.clear();
 
@@ -1565,12 +1571,12 @@ public class JadecyTest extends AbstractVirtualCodeGraphTezt {
             assertEquals((Long)P2BS, scc.get(P2N));
         }
     }
-
+    
     /*
      * 
      */
 
-    public void test_computeCycles_exception() {
+    public void test_computeCycles_exceptions() {
         final Jadecy jdc = newJadecy();
 
         try {
@@ -1619,6 +1625,12 @@ public class JadecyTest extends AbstractVirtualCodeGraphTezt {
         final Jadecy jdc = newJadecy();
 
         for (boolean withTopLevel : new boolean[]{false,true}) {
+            
+            if (DEBUG) {
+                System.out.println();
+                System.out.println("withTopLevel = " + withTopLevel);
+            }
+
             final PackageData defaultP = jdc.parser().getDefaultPackageData();
             defaultP.clear();
 
@@ -1704,6 +1716,12 @@ public class JadecyTest extends AbstractVirtualCodeGraphTezt {
 
     public void test_computeCycles_normal_CLASS_maxSize() {
         for (int maxSize : new int[]{-1,0,1,2,3,4,5}) {
+            
+            if (DEBUG) {
+                System.out.println();
+                System.out.println("maxSize = " + maxSize);
+            }
+            
             final Jadecy jdc = newJadecy();
 
             final MyCycleProcessor processor = new MyCycleProcessor();
@@ -1744,7 +1762,272 @@ public class JadecyTest extends AbstractVirtualCodeGraphTezt {
      * 
      */
 
-    public void test_computeSomeCycles_exception() {
+    public void test_computeShortestCycles_exceptions() {
+        final Jadecy jdc = newJadecy();
+
+        try {
+            jdc.computeShortestCycles(
+                    null,
+                    0,
+                    new MyCycleProcessor());
+            assertTrue(false);
+        } catch (NullPointerException e) {
+            // ok
+        }
+
+        try {
+            jdc.computeShortestCycles(
+                    ElemType.CLASS,
+                    0,
+                    null);
+            assertTrue(false);
+        } catch (NullPointerException e) {
+            // ok
+        }
+    }
+
+    public void test_computeShortestCycles_displayNameUsage() {
+        final Jadecy jdc = newJadecy();
+
+        // Ensuring default package is in a cycle.
+        final PackageData defaultP = jdc.parser().getDefaultPackageData();
+        final ClassData c0 = defaultP.getOrCreateClassData("ClassInDefaultP");
+        final ClassData c1 = defaultP.getClassData(C1N);
+        PackageData.ensureDependency(c0, c1);
+        PackageData.ensureDependency(c1, c0);
+
+        final MyCycleProcessor processor = new MyCycleProcessor();
+        jdc.computeShortestCycles(ElemType.PACKAGE, -1, processor);
+        final List<MyProcessed> res = processor.processedList;
+
+        if (DEBUG) {
+            System.out.println("res = " + res);
+        }
+
+        assertEquals(NameUtils.DEFAULT_PACKAGE_DISPLAY_NAME, res.get(0).names[0]);
+    }
+
+    public void test_computeShortestCycles_ignoredIfConfinedInATopLevelClass() {
+        final Jadecy jdc = newJadecy();
+
+        for (boolean withTopLevel : new boolean[]{false,true}) {
+            
+            if (DEBUG) {
+                System.out.println();
+                System.out.println("withTopLevel = " + withTopLevel);
+            }
+
+            final PackageData defaultP = jdc.parser().getDefaultPackageData();
+            defaultP.clear();
+
+            final ClassData c1 = defaultP.getOrCreateClassData("a.b.A$B");
+            final ClassData c2;
+            if (withTopLevel) {
+                c2 = defaultP.getOrCreateClassData("a.b.A");
+            } else {
+                c2 = defaultP.getOrCreateClassData("a.b.A$C");
+            }
+            {
+                PackageData.ensureDependency(c1, c2);
+                PackageData.ensureDependency(c2, c1);
+            }
+
+            /*
+             * 
+             */
+
+            final MyCycleProcessor processor = new MyCycleProcessor();
+            jdc.computeShortestCycles(ElemType.CLASS, -1, processor);
+            final List<MyProcessed> res = processor.processedList;
+
+            if (DEBUG) {
+                System.out.println("res = " + res);
+            }
+
+            assertEquals(0, res.size());
+        }
+    }
+    
+    public void test_computeShortestCycles_normal_CLASS() {
+        final Jadecy jdc = newJadecy();
+
+        final MyCycleProcessor processor = new MyCycleProcessor();
+        jdc.computeShortestCycles(ElemType.CLASS, -1, processor);
+        final Set<MyProcessed> res = new HashSet<MyProcessed>(processor.processedList);
+
+        if (DEBUG) {
+            System.out.println("res = " + res);
+        }
+
+        final Set<MyProcessed> expected = new HashSet<JadecyTest.MyProcessed>();
+        expected.add(
+                new MyProcessed(
+                        new String[]{C2N, C5N, C4N}));
+        expected.add(
+                new MyProcessed(
+                        new String[]{C2N, C5N, C7N, C6N, C4N}));
+        expected.add(
+                new MyProcessed(
+                        new String[]{C4N, C6N}));
+        expected.add(
+                new MyProcessed(
+                        new String[]{C6N, C7N}));
+
+        checkEqual(expected, res);
+    }
+
+    public void test_computeShortestCycles_normal_PACKAGE() {
+        final Jadecy jdc = newJadecy();
+
+        final MyCycleProcessor processor = new MyCycleProcessor();
+        jdc.computeShortestCycles(ElemType.PACKAGE, -1, processor);
+
+        final Set<MyProcessed> res = new HashSet<MyProcessed>(processor.processedList);
+
+        if (DEBUG) {
+            System.out.println("res = " + res);
+        }
+
+        final Set<MyProcessed> expected = new HashSet<JadecyTest.MyProcessed>();
+        expected.add(
+                new MyProcessed(
+                        new String[]{P1N, P2N},
+                        new String[][]{
+                                new String[]{C2N, C4N},
+                                new String[]{C5N, C6N},
+                        }));
+
+        checkEqual(expected, res);
+    }
+
+    public void test_computeShortestCycles_normal_CLASS_maxSize() {
+        for (int maxSize : new int[]{-1,0,1,2,3,4,5}) {
+            
+            if (DEBUG) {
+                System.out.println();
+                System.out.println("maxSize = " + maxSize);
+            }
+
+            final Jadecy jdc = newJadecy();
+
+            final MyCycleProcessor processor = new MyCycleProcessor();
+            jdc.computeShortestCycles(
+                    ElemType.CLASS,
+                    maxSize,
+                    processor);
+            final Set<MyProcessed> res = new HashSet<MyProcessed>(processor.processedList);
+
+            if (DEBUG) {
+                System.out.println("res = " + res);
+            }
+
+            final Set<MyProcessed> expected = new HashSet<JadecyTest.MyProcessed>();
+            if ((maxSize < 0) || (maxSize >= 3)) {
+                expected.add(
+                        new MyProcessed(
+                                new String[]{C2N, C5N, C4N}));
+            }
+            if ((maxSize < 0) || (maxSize >= 5)) {
+                expected.add(
+                        new MyProcessed(
+                                new String[]{C2N, C5N, C7N, C6N, C4N}));
+            }
+            if ((maxSize < 0) || (maxSize >= 2)) {
+                expected.add(
+                        new MyProcessed(
+                                new String[]{C4N, C6N}));
+                expected.add(
+                        new MyProcessed(
+                                new String[]{C6N, C7N}));
+            }
+            checkEqual(expected, res);
+        }
+    }
+    
+    /*
+     * 
+     */
+    
+    /**
+     * Checks that computeCycles(...) and computeShortestCycles(...)
+     * use proper algorithms (they behave identically for other tests).
+     */
+    public void test_computeAllOrShortestCycles_computedCycles() {
+        final Jadecy jdc = newJadecy();
+        
+        /*
+         * Replacing all dependencies with a small "ball graph".
+         */
+        
+        {
+            final PackageData defaultP =
+                    jdc.parser().getDefaultPackageData();
+            
+            defaultP.clear();
+            
+            final int n = 3;
+            final ArrayList<ClassData> cList = new ArrayList<ClassData>();
+            for (int i = 0; i < n; i++) {
+                final ClassData cN = defaultP.getOrCreateClassData("c" + i);
+                cList.add(cN);
+            }
+            for (int i = 0; i < n; i++) {
+                final ClassData ci = cList.get(i);
+                for (int j = 0; j < n; j++) {
+                    if (j == i) {
+                        // Can't have dependency to self.
+                        continue;
+                    }
+                    final ClassData cj = cList.get(j);
+                    PackageData.ensureDependency(ci, cj);
+                }
+            }
+        }
+        
+        /*
+         * 
+         */
+        
+        final int maxSize = -1;
+        
+        for (boolean mustUseShortestCycles : new boolean[]{false,true}) {
+            
+            if (DEBUG) {
+                System.out.println();
+                System.out.println("mustUseShortestCycles = " + mustUseShortestCycles);
+            }
+
+            final MyCycleProcessor processor = new MyCycleProcessor();
+            if (mustUseShortestCycles) {
+                jdc.computeShortestCycles(
+                        ElemType.CLASS,
+                        maxSize,
+                        processor);
+            } else {
+                jdc.computeCycles(
+                        ElemType.CLASS,
+                        maxSize,
+                        processor);
+            }
+            final Set<MyProcessed> res = new HashSet<MyProcessed>(processor.processedList);
+
+            if (DEBUG) {
+                System.out.println("res = " + res);
+            }
+            
+            if (mustUseShortestCycles) {
+                assertEquals(3, res.size());
+            } else {
+                assertEquals(5, res.size());
+            }
+        }
+    }
+
+    /*
+     * 
+     */
+
+    public void test_computeSomeCycles_exceptions() {
         final Jadecy jdc = newJadecy();
 
         try {
@@ -1842,6 +2125,12 @@ public class JadecyTest extends AbstractVirtualCodeGraphTezt {
 
     public void test_computeSomeCycles_normal_CLASS_maxSize() {
         for (int maxSize : new int[]{-1,0,1,2,3}) {
+            
+            if (DEBUG) {
+                System.out.println();
+                System.out.println("maxSize = " + maxSize);
+            }
+            
             final Jadecy jdc = newJadecy();
 
             final MyCycleProcessor processor = new MyCycleProcessor();

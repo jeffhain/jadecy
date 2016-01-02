@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2016 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,9 +29,10 @@ import net.jadecy.parsing.FsDepsParserFactory;
 import net.jadecy.parsing.InterfaceDepsParser;
 import net.jadecy.parsing.InterfaceDepsParserFactory;
 import net.jadecy.parsing.ParsingFilters;
+import net.jadecy.utils.ArgsUtils;
 
 /**
- * Allows for a simple usage of Jadecy from command line.
+ * Allows for a simple usage of Jadecy from command line, or programmatically.
  */
 public class JadecyMain {
 
@@ -46,20 +47,29 @@ public class JadecyMain {
     //--------------------------------------------------------------------------
 
     /**
-     * Cf. printUsage() code.
+     * @param args Arguments, as specified by JdcmCommand.printUsage(...) code.
      */
     public static void main(String[] args) {
         runArgs(args, FsDepsParserFactory.DEFAULT_INSTANCE, System.out);
     }
     
-    //--------------------------------------------------------------------------
-    // PACKAGE-PRIVATE METHODS
-    //--------------------------------------------------------------------------
-
-    static void runArgs(
+    /**
+     * For flexible programmatic usage.
+     * 
+     * @param args Arguments, as specified by JdcmCommand.printUsage(...) code.
+     * @param parserFactory Factory for parser to use. Must not be null.
+     * @param defaultStream Stream to use for output (unless -tofile option
+     *        is used). Must not be null.
+     * @throws NullPointerException if either argument is null.
+     */
+    public static void runArgs(
             String[] args,
             InterfaceDepsParserFactory parserFactory,
             PrintStream defaultStream) {
+        
+        ArgsUtils.requireNonNull2(args);
+        ArgsUtils.requireNonNull(parserFactory);
+        ArgsUtils.requireNonNull(defaultStream);
         
         if (DEBUG) {
             for (int i = 0; i < args.length; i++) {
@@ -238,6 +248,10 @@ public class JadecyMain {
         } else if (compType == JdcmCompType.CYCLES) {
 
             JdcmComp_CYCLES.runCommand(jdc, cmd, stream);
+
+        } else if (compType == JdcmCompType.SCYCLES) {
+
+            JdcmComp_SCYCLES.runCommand(jdc, cmd, stream);
 
         } else if (compType == JdcmCompType.SOMECYCLES) {
 

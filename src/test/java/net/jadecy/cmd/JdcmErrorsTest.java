@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2016 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 
+import net.jadecy.parsing.FsDepsParserFactory;
 import net.jadecy.utils.MemPrintStream;
 import net.jadecy.virtual.AbstractVirtualCodeGraphTezt;
 
@@ -29,6 +30,45 @@ public class JdcmErrorsTest extends AbstractJdcmTezt {
     // PUBLIC METHODS
     //--------------------------------------------------------------------------
 
+    public void test_runArgs_exceptions() {
+        
+        try {
+            JadecyMain.runArgs(
+                    null,
+                    FsDepsParserFactory.DEFAULT_INSTANCE,
+                    System.out);
+        } catch (NullPointerException e) {
+            // ok
+        }
+        
+        try {
+            JadecyMain.runArgs(
+                    new String[]{"", null, ""},
+                    FsDepsParserFactory.DEFAULT_INSTANCE,
+                    System.out);
+        } catch (NullPointerException e) {
+            // ok
+        }
+        
+        try {
+            JadecyMain.runArgs(
+                    new String[]{},
+                    null,
+                    System.out);
+        } catch (NullPointerException e) {
+            // ok
+        }
+        
+        try {
+            JadecyMain.runArgs(
+                    new String[]{},
+                    FsDepsParserFactory.DEFAULT_INSTANCE,
+                    null);
+        } catch (NullPointerException e) {
+            // ok
+        }
+    }
+    
     public void test_unrecognizedOption() {
         final String[] args = getArgs("-depsof a -foo");
 
@@ -173,11 +213,21 @@ public class JdcmErrorsTest extends AbstractJdcmTezt {
                 JdcmCompType.PATHSG);
     }
 
+    public void test_incompatibilitiesOfMinsize() {
+        test_incompatibilitiesOf(
+                "minsize",
+                JdcmCompType.SCCS,
+                JdcmCompType.CYCLES,
+                JdcmCompType.SCYCLES,
+                JdcmCompType.SOMECYCLES);
+    }
+
     public void test_incompatibilitiesOfMaxsize() {
         test_incompatibilitiesOf(
                 "maxsize",
                 JdcmCompType.SCCS,
                 JdcmCompType.CYCLES,
+                JdcmCompType.SCYCLES,
                 JdcmCompType.SOMECYCLES);
     }
 
@@ -186,6 +236,7 @@ public class JdcmErrorsTest extends AbstractJdcmTezt {
                 "maxcount",
                 JdcmCompType.SCCS,
                 JdcmCompType.CYCLES,
+                JdcmCompType.SCYCLES,
                 JdcmCompType.SOMECYCLES);
     }
 
@@ -197,6 +248,7 @@ public class JdcmErrorsTest extends AbstractJdcmTezt {
                 JdcmCompType.SPATH,
                 JdcmCompType.PATHSG,
                 JdcmCompType.CYCLES,
+                JdcmCompType.SCYCLES,
                 JdcmCompType.SOMECYCLES);
     }
 
@@ -208,6 +260,7 @@ public class JdcmErrorsTest extends AbstractJdcmTezt {
                 JdcmCompType.SPATH,
                 JdcmCompType.PATHSG,
                 JdcmCompType.CYCLES,
+                JdcmCompType.SCYCLES,
                 JdcmCompType.SOMECYCLES);
     }
 
