@@ -131,20 +131,17 @@ public class CyclesComputer {
         public int compareTo(MyComparableScc other) {
             final int size1 = this.size();
             final int size2 = other.size();
+            // No overflow since both >= 0.
+            final int cmp = size1 - size2;
+            if (cmp != 0) {
+                return cmp;
+            }
             if (size1 == 0) {
-                if (size2 == 0) {
-                    return 0;
-                } else {
-                    return -1;
-                }
+                return 0;
             } else {
-                if (size2 == 0) {
-                    return 1;
-                } else {
-                    final InterfaceVertex aFirst = this.first();
-                    final InterfaceVertex bFirst = other.first();
-                    return aFirst.compareTo(bFirst);
-                }
+                final InterfaceVertex aFirst = this.first();
+                final InterfaceVertex bFirst = other.first();
+                return aFirst.compareTo(bFirst);
             }
         }
     }

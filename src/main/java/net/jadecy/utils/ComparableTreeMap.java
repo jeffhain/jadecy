@@ -56,17 +56,17 @@ public class ComparableTreeMap<K extends Comparable<K>,V> extends TreeMap<K,V> i
     public int compareTo(ComparableTreeMap<K,V> other) {
         final int aSize = this.size();
         final int bSize = other.size();
-        if (aSize < bSize) {
-            return -1;
-        } else if (aSize > bSize) {
-            return 1;
+        // No overflow since both >= 0.
+        int cmp = aSize - bSize;
+        if (cmp != 0) {
+            return cmp;
         }
         final Iterator<K> aIt = this.keySet().iterator();
         final Iterator<K> bIt = other.keySet().iterator();
         for (int i = 0; i < aSize; i++) {
             final K av = aIt.next();
             final K bv = bIt.next();
-            final int cmp = av.compareTo(bv);
+            cmp = av.compareTo(bv);
             if (cmp != 0) {
                 return cmp;
             }

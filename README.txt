@@ -6,6 +6,15 @@ Current dependencies:
   - Java 8+
   - JUnit 3.8.1 (under lib/junit.jar)
 ################################################################################
+Jadecy x.x, xxxx/xx/xx
+
+Changes since version 1.1:
+
+- Simplified some Comparable/Comparator implementations.
+
+- Added SplitPackageSample.
+
+################################################################################
 Jadecy 1.1, 2016/01/02
 
 Changes since version 1.0:

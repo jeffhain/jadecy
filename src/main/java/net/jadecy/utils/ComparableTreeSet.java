@@ -51,17 +51,17 @@ public class ComparableTreeSet<T extends Comparable<T>> extends TreeSet<T> imple
     public int compareTo(ComparableTreeSet<T> other) {
         final int aSize = this.size();
         final int bSize = other.size();
-        if (aSize < bSize) {
-            return -1;
-        } else if (aSize > bSize) {
-            return 1;
+        // No overflow since both >= 0.
+        int cmp = aSize - bSize;
+        if (cmp != 0) {
+            return cmp;
         }
         final Iterator<T> aIt = this.iterator();
         final Iterator<T> bIt = other.iterator();
         for (int i = 0; i < aSize; i++) {
             final T av = aIt.next();
             final T bv = bIt.next();
-            final int cmp = av.compareTo(bv);
+            cmp = av.compareTo(bv);
             if (cmp != 0) {
                 return cmp;
             }

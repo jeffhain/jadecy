@@ -182,13 +182,8 @@ public class ShortestCyclesComputer {
         public int compare(WorkVertex v1, WorkVertex v2) {
             final int n1 = v1.successors().size();
             final int n2 = v2.successors().size();
-            if (n1 < n2) {
-                return -1;
-            } else if (n1 > n2) {
-                return 1;
-            } else {
-                return 0;
-            }
+            // No overflow since both >= 0.
+            return n1 - n2;
         }
     }
 

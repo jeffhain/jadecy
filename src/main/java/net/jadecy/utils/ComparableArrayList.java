@@ -50,16 +50,16 @@ public class ComparableArrayList<T extends Comparable<T>> extends ArrayList<T> i
     public int compareTo(ComparableArrayList<T> other) {
         final int aSize = this.size();
         final int bSize = other.size();
-        if (aSize < bSize) {
-            return -1;
-        } else if (aSize > bSize) {
-            return 1;
+        // No overflow since both >= 0.
+        int cmp = aSize - bSize;
+        if (cmp != 0) {
+            return cmp;
         }
         final int size = aSize;
         for (int i = 0; i < size; i++) {
             final T av = this.get(i);
             final T bv = other.get(i);
-            final int cmp = av.compareTo(bv);
+            cmp = av.compareTo(bv);
             if (cmp != 0) {
                 return cmp;
             }
