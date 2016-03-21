@@ -4,14 +4,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import net.jadecy.ElemType;
-import net.jadecy.Jadecy;
 import net.jadecy.build.JadecyBuildConfig;
 import net.jadecy.code.InterfaceNameFilter;
 import net.jadecy.code.NameFilters;
@@ -89,18 +88,15 @@ public class SplitPackageSample {
                     ParsingFilters.defaultInstance());
             
             // Extracting packages names and byte size of their classes.
-            final SortedMap<String,Long> byteSizeByPackageName =
+            final Map<String,Long> byteSizeByPackageName =
                     jdc.computeMatches(
                             ElemType.PACKAGE,
                             NameFilters.any());
+
+            // Removing packages just present due to dependencies.
+            removeKeysWithZeroByteSize(byteSizeByPackageName);
             
             for (Map.Entry<String,Long> entry : byteSizeByPackageName.entrySet()) {
-                final Long byteSize = entry.getValue();
-                if (byteSize.longValue() == 0) {
-                    // Just a dependency, no class defined in the jar for that package.
-                    continue;
-                }
-                
                 final String packageName = entry.getKey();
 
                 MyPackageData packageData = packageDataByPackageName.get(packageName);
@@ -118,13 +114,16 @@ public class SplitPackageSample {
                     classNameFilter = NameFilters.startsWithName(packageName);
                 }
                 
-                // Classes defined in the jar for that package.
-                final Set<String> packageClassNameSet =
+                // Classes defined in the jar for that package (plus eventually imported ones).
+                final Map<String,Long> byteSizeByPackageClassName =
                         jdc.computeMatches(
                                 ElemType.CLASS,
-                                classNameFilter).keySet();
+                                classNameFilter);
                 
-                packageData.packageClassNameSetByJarFile.put(jarFile, packageClassNameSet);
+                // Removing classes just present due to dependencies.
+                removeKeysWithZeroByteSize(byteSizeByPackageClassName);
+                
+                packageData.packageClassNameSetByJarFile.put(jarFile, byteSizeByPackageClassName.keySet());
             }
         }
         
@@ -178,6 +177,15 @@ public class SplitPackageSample {
                         jarFileList.add(file);
                     }
                 }
+            }
+        }
+    }
+    
+    private static void removeKeysWithZeroByteSize(Map<String,Long> byteSizeByKey) {
+        for (Iterator<Map.Entry<String,Long>> it = byteSizeByKey.entrySet().iterator(); it.hasNext();) {
+            final Map.Entry<String,Long> entry = it.next();
+            if (entry.getValue().longValue() == 0) {
+                it.remove();
             }
         }
     }
