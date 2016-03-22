@@ -12,6 +12,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import net.jadecy.build.JadecyBuildConfig;
+import net.jadecy.code.AbstractNameFilter;
 import net.jadecy.code.InterfaceNameFilter;
 import net.jadecy.code.NameFilters;
 import net.jadecy.code.NameUtils;
@@ -111,7 +112,15 @@ public class SplitPackageSample {
                 if (isDefaultPackage) {
                     classNameFilter = NameFilters.not(NameFilters.contains("."));
                 } else {
-                    classNameFilter = NameFilters.startsWithName(packageName);
+                    classNameFilter = NameFilters.and(
+                            NameFilters.startsWithName(packageName),
+                            // To avoid classes in subpackages.
+                            new AbstractNameFilter() {
+                                @Override
+                                public boolean accept(String name) {
+                                    return name.lastIndexOf('.') == packageName.length();
+                                }
+                            });
                 }
                 
                 // Classes defined in the jar for that package (plus eventually imported ones).
