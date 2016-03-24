@@ -6,7 +6,7 @@ Current dependencies:
   - Java 8+
   - JUnit 3.8.1 (under lib/junit.jar)
 ################################################################################
-Jadecy x.x, xxxx/xx/xx
+Jadecy 1.1.1, 2016/03/24
 
 Changes since version 1.1:
 
