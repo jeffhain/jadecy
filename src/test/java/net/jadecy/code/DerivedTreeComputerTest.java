@@ -115,7 +115,7 @@ public class DerivedTreeComputerTest extends TestCase {
                 NameFilters.any());
 
         // Not derived because is empty (and is not default package).
-        assertNull(derDefaultP.getPackageData(emptyPackageData.name()));
+        assertEquals(null, derDefaultP.getPackageData(emptyPackageData.name()));
 
         final MemPrintStream stream = new MemPrintStream();
 

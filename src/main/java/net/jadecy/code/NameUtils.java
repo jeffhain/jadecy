@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2016 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,12 @@ import net.jadecy.utils.ArgsUtils;
  */
 public class NameUtils {
 
+    //--------------------------------------------------------------------------
+    // CONFIGURATION
+    //--------------------------------------------------------------------------
+    
+    static final boolean HANDLE_WEIRD_DOLLAR_SIGN_USAGES = true;
+    
     //--------------------------------------------------------------------------
     // MEMBERS
     //--------------------------------------------------------------------------
@@ -123,12 +129,31 @@ public class NameUtils {
      * @throws NullPointerException if the specified class name is null.
      */
     public static String getTopLevelClassName(String className) {
+        // Computing last dot index, both to avoid trouble with dollar sign
+        // usage in package name, and because it should speed things up
+        // in case of long package name (will only iterate over
+        // class file name no ext).
         // Implicit null check.
-        final int dollarIndex = className.indexOf(CHAR_DOLLAR);
-        if (dollarIndex < 0) {
+        final int lastDotIndex = className.lastIndexOf(CHAR_DOT);
+        
+        // Works even if lastDotIndex < 0.
+        final int firstDollarAfterDotIndex = className.indexOf(CHAR_DOLLAR, lastDotIndex+1);
+        if (firstDollarAfterDotIndex < 0) {
             return className;
         } else {
-            return className.substring(0, dollarIndex);
+            if (NameUtils.HANDLE_WEIRD_DOLLAR_SIGN_USAGES) {
+                final String classFileNameNoExt;
+                if (lastDotIndex < 0) {
+                    classFileNameNoExt = className;
+                } else {
+                    classFileNameNoExt = className.substring(lastDotIndex+1);
+                }
+                if (isDollarPathologicalClassFileNameNoExt(classFileNameNoExt)) {
+                    // Considering it's a top level class name.
+                    return className;
+                }
+            }
+            return className.substring(0, firstDollarAfterDotIndex);
         }
     }
     
@@ -146,6 +171,12 @@ public class NameUtils {
             // No outer class.
             return null;
         } else {
+            if (NameUtils.HANDLE_WEIRD_DOLLAR_SIGN_USAGES) {
+                if (isDollarPathologicalClassFileNameNoExt(classFileNameNoExt)) {
+                    // Considering it's a top level class name.
+                    return null;
+                }
+            }
             return classFileNameNoExt.substring(0, lastDollarIndex);
         }
     }
@@ -343,7 +374,7 @@ public class NameUtils {
             from = index + name.length() + 1;
         }
     }
-    
+
     //--------------------------------------------------------------------------
     // PRIVATE METHODS
     //--------------------------------------------------------------------------
@@ -357,5 +388,51 @@ public class NameUtils {
     
     private static void throwIAEEmptyNameIn(String name) {
         throw new IllegalArgumentException("empty name in " + name);
+    }
+    
+    /*
+     * 
+     */
+
+    /**
+     * @return True if the specified class file name no ext,
+     *         uses dollar signs pathologically, false otherwise.
+     */
+    private static boolean isDollarPathologicalClassFileNameNoExt(
+            String classFileNameNoExt) {
+        
+        final int firstDollarIndex = classFileNameNoExt.indexOf(CHAR_DOLLAR);
+        if (firstDollarIndex < 0) {
+            return false;
+        }
+        
+        final int size = classFileNameNoExt.length();
+        
+        if ((firstDollarIndex == 0)
+                || (classFileNameNoExt.charAt(size-1) == CHAR_DOLLAR)) {
+            // Starts or ends with dollar sign.
+            return true;
+        }
+        
+        /*
+         * Looking for consecutive dollar signs.
+         */
+        
+        int index1 = firstDollarIndex;
+        int index2;
+        while (true) {
+            final int i1p1 = index1 + 1;
+            index2 = classFileNameNoExt.indexOf(CHAR_DOLLAR, i1p1);
+            if (index2 < 0) {
+                break;
+            }
+            if (index2 == i1p1) {
+                // Consecutive dollar signs.
+                return true;
+            }
+            index1 = index2;
+        }
+        
+        return false;
     }
 }

@@ -26,6 +26,8 @@ import net.jadecy.code.NameFilters;
 import net.jadecy.parsing.ParsingFilters;
 import net.jadecy.parsing.test1.A;
 import net.jadecy.parsing.test2.B;
+import net.jadecy.parsing.test$.$;
+import net.jadecy.parsing.test$.$X;
 import net.jadecy.tests.JdcTestCompHelper;
 
 /**
@@ -148,7 +150,21 @@ public class DepsTest extends TestCase {
                         A.class.getName(),
                         B.class.getName(),
                 });
-        
+
+        depUnit.addAllowedCycle(
+                elemType,
+                new String[]{
+                        $.class.getName(),
+                        $.$$.class.getName(),
+                });
+
+        depUnit.addAllowedCycle(
+                elemType,
+                new String[]{
+                        $X.class.getName(),
+                        $X.Y.class.getName(),
+                });
+
         /*
          * 
          */

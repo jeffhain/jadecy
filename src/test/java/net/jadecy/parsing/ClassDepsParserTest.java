@@ -32,7 +32,11 @@ import java.util.TreeSet;
 
 import junit.framework.TestCase;
 import net.jadecy.comp.FileSystemHelper;
-import net.jadecy.parsing.ClassDepsParser;
+import net.jadecy.parsing.test$.$;
+import net.jadecy.parsing.test$.$$;
+import net.jadecy.parsing.test$.$A;
+import net.jadecy.parsing.test$.A$;
+import net.jadecy.parsing.test$.A$$B;
 import net.jadecy.parsing.testp.TestAnno1;
 import net.jadecy.parsing.testp.TestAnno2;
 import net.jadecy.tests.JdcTestCompHelper;
@@ -62,6 +66,8 @@ public class ClassDepsParserTest extends TestCase {
      * TODO cf. https://bugs.openjdk.java.net/browse/JDK-8136419.
      */
     private static final boolean BUG_JDK_8136419_FIXED = false;
+    
+    private static final boolean HANDLE_WEIRD_DOLLAR_SIGN_USAGES = true;
 
     //--------------------------------------------------------------------------
     // MEMBERS
@@ -104,7 +110,7 @@ public class ClassDepsParserTest extends TestCase {
             emptyClassFile.delete();
         }
 
-        assertNull(thisClassName);
+        assertEquals(null, thisClassName);
         assertEquals(0, actual.size());
     }
 
@@ -2283,6 +2289,118 @@ public class ClassDepsParserTest extends TestCase {
             }
 
             computeDepsAndCheck(MyArrayTypes.class.getName(), apiOnly, expected);
+        }
+    }
+
+    /*
+     * 
+     */
+
+    public void test_dollarSign_$() {
+        if (!HANDLE_WEIRD_DOLLAR_SIGN_USAGES) {
+            return;
+        }
+        
+        for (boolean apiOnly : FALSE_TRUE) {
+
+            final SortedSet<String> expected = new TreeSet<String>();
+            //
+            addSlashedName(expected, Object.class);
+            //
+            if (apiOnly) {
+            } else {
+                addSlashedName(expected, $.$$.class);
+            }
+
+            computeDepsAndCheck($.class.getName(), apiOnly, expected);
+        }
+    }
+
+    public void test_dollarSign_$$() {
+        if (!HANDLE_WEIRD_DOLLAR_SIGN_USAGES) {
+            return;
+        }
+        
+        for (boolean apiOnly : FALSE_TRUE) {
+
+            final SortedSet<String> expected = new TreeSet<String>();
+            //
+            addSlashedName(expected, Object.class);
+            //
+            if (apiOnly) {
+            } else {
+                addSlashedName(expected, $.class);
+                addSlashedName(expected, $A.class);
+                addSlashedName(expected, A$.class);
+                addSlashedName(expected, A$$B.class);
+            }
+
+            computeDepsAndCheck($$.class.getName(), apiOnly, expected);
+        }
+    }
+
+    public void test_dollarSign_$_$$() {
+        if (!HANDLE_WEIRD_DOLLAR_SIGN_USAGES) {
+            return;
+        }
+        
+        for (boolean apiOnly : FALSE_TRUE) {
+
+            final SortedSet<String> expected = new TreeSet<String>();
+            //
+            addSlashedName(expected, Object.class);
+            //
+            if (apiOnly) {
+            } else {
+                addSlashedName(expected, $.class);
+            }
+
+            computeDepsAndCheck($.$$.class.getName(), apiOnly, expected);
+        }
+    }
+
+    public void test_dollarSign_$A() {
+        if (!HANDLE_WEIRD_DOLLAR_SIGN_USAGES) {
+            return;
+        }
+        
+        for (boolean apiOnly : FALSE_TRUE) {
+
+            final SortedSet<String> expected = new TreeSet<String>();
+            //
+            addSlashedName(expected, Object.class);
+            
+            computeDepsAndCheck($A.class.getName(), apiOnly, expected);
+        }
+    }
+
+    public void test_dollarSign_A$() {
+        if (!HANDLE_WEIRD_DOLLAR_SIGN_USAGES) {
+            return;
+        }
+        
+        for (boolean apiOnly : FALSE_TRUE) {
+
+            final SortedSet<String> expected = new TreeSet<String>();
+            //
+            addSlashedName(expected, Object.class);
+
+            computeDepsAndCheck(A$.class.getName(), apiOnly, expected);
+        }
+    }
+
+    public void test_dollarSign_A$$B() {
+        if (!HANDLE_WEIRD_DOLLAR_SIGN_USAGES) {
+            return;
+        }
+        
+        for (boolean apiOnly : FALSE_TRUE) {
+
+            final SortedSet<String> expected = new TreeSet<String>();
+            //
+            addSlashedName(expected, Object.class);
+
+            computeDepsAndCheck(A$$B.class.getName(), apiOnly, expected);
         }
     }
 

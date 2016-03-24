@@ -35,9 +35,9 @@ public class PackageDataTest extends TestCase {
     public void test_PackageData() {
         final PackageData defaultP = new PackageData();
         
-        assertNull(defaultP.parent());
+        assertEquals(null, defaultP.parent());
         assertSame(defaultP, defaultP.root());
-        assertNull(defaultP.fileNameNoExt());
+        assertEquals(null, defaultP.fileNameNoExt());
         assertEquals("", defaultP.name());
         assertEquals(NameUtils.DEFAULT_PACKAGE_DISPLAY_NAME, defaultP.displayName());
     }
@@ -223,11 +223,11 @@ public class PackageDataTest extends TestCase {
         assertSame(c11, p1.getClassData("c11"));
         
         // Not a class.
-        assertNull(defaultP.getClassData("p2"));
+        assertEquals(null, defaultP.getClassData("p2"));
 
         defaultP.getOrCreatePackageData("p2");
         // Still not a class.
-        assertNull(defaultP.getClassData("p2"));
+        assertEquals(null, defaultP.getClassData("p2"));
     }
     
     public void test_getPackageData_String() {
@@ -259,11 +259,11 @@ public class PackageDataTest extends TestCase {
         assertSame(p11, p11.getPackageData(""));
         
         // Not a package.
-        assertNull(defaultP.getPackageData("c1"));
+        assertEquals(null, defaultP.getPackageData("c1"));
 
         defaultP.getOrCreateClassData("c1");
         // Still not a package.
-        assertNull(defaultP.getPackageData("c1"));
+        assertEquals(null, defaultP.getPackageData("c1"));
     }
 
     /*
@@ -274,76 +274,138 @@ public class PackageDataTest extends TestCase {
         
         final PackageData defaultP = new PackageData();
 
-        try {
-            defaultP.getOrCreateClassData(null);
-            assertTrue(false);
-        } catch (NullPointerException e) {
-            // ok
-        }
-
-        for (String bad : new String[]{
-                "",
-                "bad..dots"
-        }) {
+        {
             try {
-                defaultP.getOrCreateClassData(bad);
+                defaultP.getOrCreateClassData(null);
                 assertTrue(false);
-            } catch (IllegalArgumentException e) {
+            } catch (NullPointerException e) {
                 // ok
             }
-        }
-        
-        final ClassData c1 = defaultP.getOrCreateClassData("c1");
-        assertSame(c1, defaultP.getClassData("c1"));
-        assertSame(defaultP, c1.parent());
-        assertSame(defaultP, c1.root());
-        assertEquals("c1", c1.fileNameNoExt());
-        assertEquals("c1", c1.name());
-        assertSame(c1.name(), c1.displayName());
-        assertEquals(0L, c1.byteSize());
-        assertEquals(0, c1.successors().size());
-        assertEquals(0, c1.predecessors().size());
 
-        final PackageData p1 = defaultP.getOrCreatePackageData("p1");
-        final ClassData c111 = p1.getOrCreateClassData("p11.c111");
-        assertSame(c111, p1.getClassData("p11.c111"));
+            for (String bad : new String[]{
+                    "",
+                    "bad..dots"
+            }) {
+                try {
+                    defaultP.getOrCreateClassData(bad);
+                    assertTrue(false);
+                } catch (IllegalArgumentException e) {
+                    // ok
+                }
+            }
+            
+            final ClassData c1 = defaultP.getOrCreateClassData("c1");
+            assertSame(c1, defaultP.getClassData("c1"));
+            assertSame(defaultP, c1.parent());
+            assertSame(defaultP, c1.root());
+            assertEquals("c1", c1.fileNameNoExt());
+            assertEquals("c1", c1.name());
+            assertSame(c1.name(), c1.displayName());
+            assertEquals(0L, c1.byteSize());
+            assertEquals(0, c1.successors().size());
+            assertEquals(0, c1.predecessors().size());
+
+            final PackageData p1 = defaultP.getOrCreatePackageData("p1");
+            final ClassData c111 = p1.getOrCreateClassData("p11.c111");
+            assertSame(c111, p1.getClassData("p11.c111"));
+        }
+
+        if (NameUtils.HANDLE_WEIRD_DOLLAR_SIGN_USAGES) {
+            for (String className : new String[]{
+                    "foo.bar.$",
+                    "foo.bar.$$",
+                    "foo.bar.$A",
+                    "foo.bar.A$",
+                    "foo.bar.A$$B",
+            }) {
+                final ClassData classData = defaultP.getOrCreateClassData(className);
+
+                // Weird name -> considered as top level.
+                assertSame(classData, classData.topLevelClassData());
+                assertEquals(className, classData.name());
+                assertEquals("foo.bar", classData.parent().name());
+                assertEquals(null, classData.outerClassData());
+                assertEquals(0, classData.nestedClassByFileNameNoExt_internal().size());
+                assertEquals(0, classData.nestedClassByFileNameNoExt().size());
+            }
+            
+            /*
+             * Dollar sign in package name.
+             */
+            
+            for (String n1 : new String[]{"$","a"}) {
+                for (String n2 : new String[]{"$","a"}) {
+                    final String className = n1 + "." + n2 + ".$";
+                    
+                    final ClassData classData = defaultP.getOrCreateClassData(className);
+
+                    // Weird name -> considered as top level.
+                    assertSame(classData, classData.topLevelClassData());
+                    assertEquals(className, classData.name());
+                    assertEquals(n1 + "." + n2, classData.parent().name());
+                    assertEquals(null, classData.outerClassData());
+                    assertEquals(0, classData.nestedClassByFileNameNoExt_internal().size());
+                    assertEquals(0, classData.nestedClassByFileNameNoExt().size());
+                }
+            }
+        }
     }
     
     public void test_getOrCreatePackageData_String() {
         
         final PackageData defaultP = new PackageData();
         
-        try {
-            defaultP.getOrCreatePackageData(null);
-            assertTrue(false);
-        } catch (NullPointerException e) {
-            // ok
-        }
+        {
+            try {
+                defaultP.getOrCreatePackageData(null);
+                assertTrue(false);
+            } catch (NullPointerException e) {
+                // ok
+            }
 
-        try {
-            defaultP.getOrCreatePackageData("bad..dots");
-            assertTrue(false);
-        } catch (IllegalArgumentException e) {
-            // ok
-        }
+            try {
+                defaultP.getOrCreatePackageData("bad..dots");
+                assertTrue(false);
+            } catch (IllegalArgumentException e) {
+                // ok
+            }
 
-        assertSame(defaultP, defaultP.getPackageData(""));
+            assertSame(defaultP, defaultP.getPackageData(""));
+            
+            final PackageData p1 = defaultP.getOrCreatePackageData("p1");
+            assertSame(p1, defaultP.getPackageData("p1"));
+            assertSame(defaultP, p1.parent());
+            assertSame(defaultP, p1.root());
+            assertEquals("p1", p1.fileNameNoExt());
+            assertEquals("p1", p1.name());
+            assertSame(p1.name(), p1.displayName());
+            assertEquals(0L, p1.byteSize());
+            assertEquals(0, p1.successors().size());
+            assertEquals(0, p1.predecessors().size());
+            assertEquals(0, p1.causeSetBySuccessor().size());
+            assertEquals(0, p1.causeSetByPredecessor().size());
+
+            final PackageData p11 = p1.getOrCreatePackageData("p11");
+            assertSame(p11, p1.getPackageData("p11"));
+        }
         
-        final PackageData p1 = defaultP.getOrCreatePackageData("p1");
-        assertSame(p1, defaultP.getPackageData("p1"));
-        assertSame(defaultP, p1.parent());
-        assertSame(defaultP, p1.root());
-        assertEquals("p1", p1.fileNameNoExt());
-        assertEquals("p1", p1.name());
-        assertSame(p1.name(), p1.displayName());
-        assertEquals(0L, p1.byteSize());
-        assertEquals(0, p1.successors().size());
-        assertEquals(0, p1.predecessors().size());
-        assertEquals(0, p1.causeSetBySuccessor().size());
-        assertEquals(0, p1.causeSetByPredecessor().size());
-
-        final PackageData p11 = p1.getOrCreatePackageData("p11");
-        assertSame(p11, p1.getPackageData("p11"));
+        if (NameUtils.HANDLE_WEIRD_DOLLAR_SIGN_USAGES) {
+            for (String n1 : new String[]{"$","a"}) {
+                for (String n2 : new String[]{"$","a"}) {
+                    final String p1Name = n1;
+                    final String p2Name = n1 + "." + n2;
+                    
+                    final PackageData p1 = defaultP.getOrCreatePackageData(p1Name);
+                    final PackageData p2 = defaultP.getOrCreatePackageData(p2Name);
+                    
+                    assertSame(p1, defaultP.getPackageData(p1Name));
+                    assertSame(p2, defaultP.getPackageData(p2Name));
+                    
+                    assertSame(p1, p2.parent());
+                    assertSame(p2, p1.getPackageData(n2));
+                }
+            }
+        }
     }
     
     public void test_setByteSizeForClassOrNested_ClassData_String_long() {
@@ -439,7 +501,7 @@ public class PackageDataTest extends TestCase {
         
         ClassData c11a = p1.getClassData("c11$a");
         // Setting byte size for it did not create it.
-        assertNull(c11a);
+        assertEquals(null, c11a);
         c11a = p1.getOrCreateClassData("c11$a");
         // Byte site was set for it in c11, not anywhere else.
         assertFalse(c11a.byteSizeByClassFileNameNoExt().containsKey("c11$a"));

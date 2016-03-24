@@ -662,7 +662,7 @@ public class CodeDataSturdinessTest extends TestCase {
          * Checks.
          */
         
-        assertNull(thrown);
+        assertEquals(null, thrown);
         
         assertEquals(didExist, didMod);
         

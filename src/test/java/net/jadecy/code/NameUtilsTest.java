@@ -151,6 +151,60 @@ public class NameUtilsTest extends TestCase {
         assertEquals("a.b.c", NameUtils.getTopLevelClassName("a.b.c"));
         assertEquals("a.bb.ccc", NameUtils.getTopLevelClassName("a.bb.ccc$d"));
         assertEquals("aaa.bb.c", NameUtils.getTopLevelClassName("aaa.bb.c$d$e"));
+        
+        if (NameUtils.HANDLE_WEIRD_DOLLAR_SIGN_USAGES) {
+            assertEquals("$", NameUtils.getTopLevelClassName("$"));
+            assertEquals("$$", NameUtils.getTopLevelClassName("$$"));
+            assertEquals("$$$", NameUtils.getTopLevelClassName("$$$"));
+            //
+            assertEquals("a.$", NameUtils.getTopLevelClassName("a.$"));
+            assertEquals("a.$$", NameUtils.getTopLevelClassName("a.$$"));
+            assertEquals("a.$$$", NameUtils.getTopLevelClassName("a.$$$"));
+            //
+            assertEquals("$a", NameUtils.getTopLevelClassName("$a"));
+            assertEquals("a$", NameUtils.getTopLevelClassName("a$"));
+            assertEquals("$a$", NameUtils.getTopLevelClassName("$a$"));
+            assertEquals("$a$b", NameUtils.getTopLevelClassName("$a$b"));
+            assertEquals("a$b$", NameUtils.getTopLevelClassName("a$b$"));
+            assertEquals("$a$b$", NameUtils.getTopLevelClassName("$a$b$"));
+            //
+            assertEquals("a.$a", NameUtils.getTopLevelClassName("a.$a"));
+            assertEquals("a.a$", NameUtils.getTopLevelClassName("a.a$"));
+            assertEquals("a.$a$", NameUtils.getTopLevelClassName("a.$a$"));
+            //
+            assertEquals("a$$b", NameUtils.getTopLevelClassName("a$$b"));
+            assertEquals("$a$$b", NameUtils.getTopLevelClassName("$a$$b"));
+            assertEquals("a$$b$", NameUtils.getTopLevelClassName("a$$b$"));
+            assertEquals("$a$$b$", NameUtils.getTopLevelClassName("$a$$b$"));
+            //
+            assertEquals("a.a$$b", NameUtils.getTopLevelClassName("a.a$$b"));
+            assertEquals("a.$a$$b", NameUtils.getTopLevelClassName("a.$a$$b"));
+            assertEquals("a.a$$b$", NameUtils.getTopLevelClassName("a.a$$b$"));
+            assertEquals("a.$a$$b$", NameUtils.getTopLevelClassName("a.$a$$b$"));
+            //
+            assertEquals("a$$$b", NameUtils.getTopLevelClassName("a$$$b"));
+            assertEquals("$a$$$b", NameUtils.getTopLevelClassName("$a$$$b"));
+            assertEquals("a$$$b$", NameUtils.getTopLevelClassName("a$$$b$"));
+            assertEquals("$a$$$b$", NameUtils.getTopLevelClassName("$a$$$b$"));
+            //
+            assertEquals("a.a$$$b", NameUtils.getTopLevelClassName("a.a$$$b"));
+            assertEquals("a.$a$$$b", NameUtils.getTopLevelClassName("a.$a$$$b"));
+            assertEquals("a.a$$$b$", NameUtils.getTopLevelClassName("a.a$$$b$"));
+            assertEquals("a.$a$$$b$", NameUtils.getTopLevelClassName("a.$a$$$b$"));
+            
+            /*
+             * Dollar sign in package name.
+             */
+            
+            assertEquals("$.$", NameUtils.getTopLevelClassName("$.$"));
+            assertEquals("$$.$", NameUtils.getTopLevelClassName("$$.$"));
+            assertEquals("$a.$", NameUtils.getTopLevelClassName("$a.$"));
+            assertEquals("a$.$", NameUtils.getTopLevelClassName("a$.$"));
+            assertEquals("a$$b.$", NameUtils.getTopLevelClassName("a$$b.$"));
+            //
+            assertEquals("a.$.$", NameUtils.getTopLevelClassName("a.$.$"));
+            assertEquals("$.a.$", NameUtils.getTopLevelClassName("$.a.$"));
+        }
     }
     
     public void test_getOuterClassFileNameNoExt_String() {
@@ -166,14 +220,33 @@ public class NameUtilsTest extends TestCase {
          * 
          */
         
-        assertNull(NameUtils.getOuterClassFileNameNoExt(""));
-        assertNull(NameUtils.getOuterClassFileNameNoExt("a"));
-        assertNull(NameUtils.getOuterClassFileNameNoExt("a.b"));
-        // Illegal but still handled.
-        assertEquals("", NameUtils.getOuterClassFileNameNoExt("$b"));
+        assertEquals(null, NameUtils.getOuterClassFileNameNoExt(""));
+        assertEquals(null, NameUtils.getOuterClassFileNameNoExt("a"));
         assertEquals("a", NameUtils.getOuterClassFileNameNoExt("a$b"));
-        assertEquals("a.bb.ccc", NameUtils.getOuterClassFileNameNoExt("a.bb.ccc$d"));
-        assertEquals("aaa.bb.c$d", NameUtils.getOuterClassFileNameNoExt("aaa.bb.c$d$e"));
+        assertEquals("aa$bb", NameUtils.getOuterClassFileNameNoExt("aa$bb$cc"));
+
+        if (NameUtils.HANDLE_WEIRD_DOLLAR_SIGN_USAGES) {
+            assertEquals(null, NameUtils.getOuterClassFileNameNoExt("$"));
+            assertEquals(null, NameUtils.getOuterClassFileNameNoExt("$$"));
+            assertEquals(null, NameUtils.getOuterClassFileNameNoExt("$$$"));
+            //
+            assertEquals(null, NameUtils.getOuterClassFileNameNoExt("$a"));
+            assertEquals(null, NameUtils.getOuterClassFileNameNoExt("a$"));
+            assertEquals(null, NameUtils.getOuterClassFileNameNoExt("$a$"));
+            assertEquals(null, NameUtils.getOuterClassFileNameNoExt("$a$b"));
+            assertEquals(null, NameUtils.getOuterClassFileNameNoExt("a$b$"));
+            assertEquals(null, NameUtils.getOuterClassFileNameNoExt("$a$b$"));
+            //
+            assertEquals(null, NameUtils.getOuterClassFileNameNoExt("a$$b"));
+            assertEquals(null, NameUtils.getOuterClassFileNameNoExt("$a$$b"));
+            assertEquals(null, NameUtils.getOuterClassFileNameNoExt("a$$b$"));
+            assertEquals(null, NameUtils.getOuterClassFileNameNoExt("$a$$b$"));
+            //
+            assertEquals(null, NameUtils.getOuterClassFileNameNoExt("a$$$b"));
+            assertEquals(null, NameUtils.getOuterClassFileNameNoExt("$a$$$b"));
+            assertEquals(null, NameUtils.getOuterClassFileNameNoExt("a$$$b$"));
+            assertEquals(null, NameUtils.getOuterClassFileNameNoExt("$a$$$b$"));
+        }
     }
     
     public void test_splitName_String() {
@@ -216,6 +289,21 @@ public class NameUtilsTest extends TestCase {
         checkEqual(new String[]{"a","b","c"}, NameUtils.splitName("a.b.c"));
         checkEqual(new String[]{"a","bb","ccc"}, NameUtils.splitName("a.bb.ccc"));
         checkEqual(new String[]{"aaa","bb","c"}, NameUtils.splitName("aaa.bb.c"));
+        
+        if (NameUtils.HANDLE_WEIRD_DOLLAR_SIGN_USAGES) {
+            checkEqual(new String[]{"foo","bar","$"}, NameUtils.splitName("foo.bar.$"));
+            checkEqual(new String[]{"foo","bar","$$"}, NameUtils.splitName("foo.bar.$$"));
+            checkEqual(new String[]{"foo","bar","$a"}, NameUtils.splitName("foo.bar.$a"));
+            checkEqual(new String[]{"foo","bar","a$"}, NameUtils.splitName("foo.bar.a$"));
+            checkEqual(new String[]{"foo","bar","a$$b"}, NameUtils.splitName("foo.bar.a$$b"));
+            
+            /*
+             * Dollar sign in package name.
+             */
+            
+            checkEqual(new String[]{"$","bar","$"}, NameUtils.splitName("$.bar.$"));
+            checkEqual(new String[]{"foo","$","$"}, NameUtils.splitName("foo.$.$"));
+        }
     }
 
     /*

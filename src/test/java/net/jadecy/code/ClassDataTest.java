@@ -95,7 +95,7 @@ public class ClassDataTest extends TestCase {
         final ClassData cb = defaultP.getOrCreateClassData("a$b");
         final ClassData cc = defaultP.getOrCreateClassData("a$b$c");
         
-        assertNull(ca.outerClassData());
+        assertEquals(null, ca.outerClassData());
         assertSame(ca, cb.outerClassData());
         assertSame(cb, cc.outerClassData());
     }

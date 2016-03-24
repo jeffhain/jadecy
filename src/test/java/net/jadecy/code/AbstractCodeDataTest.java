@@ -146,7 +146,7 @@ public class AbstractCodeDataTest extends TestCase {
 
     public void test_parent() {
         final MyData d0 = new MyData();
-        assertNull(d0.parent());
+        assertEquals(null, d0.parent());
 
         final MyData d1 = new MyData(d0, "d1", null);
         assertSame(d0, d1.parent());
@@ -168,7 +168,7 @@ public class AbstractCodeDataTest extends TestCase {
     
     public void test_fileNameNoExt() {
         final MyData d0 = new MyData();
-        assertNull(d0.fileNameNoExt());
+        assertEquals(null, d0.fileNameNoExt());
 
         final MyData d1 = new MyData(d0, "d1", null);
         assertEquals("d1", d1.fileNameNoExt());
@@ -285,8 +285,8 @@ public class AbstractCodeDataTest extends TestCase {
         {
             final MyData original = new MyData();
             final MyData defaultP = new MyData(null, null, original);
-            assertNull(defaultP.parent());
-            assertNull(defaultP.fileNameNoExt());
+            assertEquals(null, defaultP.parent());
+            assertEquals(null, defaultP.fileNameNoExt());
         }
         
         // Original strings reuse.

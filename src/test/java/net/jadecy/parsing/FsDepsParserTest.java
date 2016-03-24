@@ -25,6 +25,8 @@ import net.jadecy.code.ClassData;
 import net.jadecy.code.NameFilters;
 import net.jadecy.code.NameUtils;
 import net.jadecy.code.PackageData;
+import net.jadecy.parsing.test$.$X;
+import net.jadecy.parsing.test$.X$Y;
 import net.jadecy.parsing.test1.A;
 import net.jadecy.parsing.test2.B;
 import net.jadecy.tests.JdcTestCompHelper;
@@ -41,6 +43,8 @@ public class FsDepsParserTest extends TestCase {
             JdcTestCompHelper.ensureCompiledAndGetOutputDirPath(
                     JdcTestCompHelper.MAIN_SRC_PATH,
                     JdcTestCompHelper.TEST_SRC_PATH);
+    
+    private static final boolean HANDLE_WEIRD_DOLLAR_SIGN_USAGES = true;
 
     //--------------------------------------------------------------------------
     // MEMBERS
@@ -64,10 +68,18 @@ public class FsDepsParserTest extends TestCase {
     private static final String CLASS_B_NAME = B.class.getName();
     private static final String CLASS_C_NAME = CLASS_B_NAME + "$C";
     private static final String PACKAGE_TEST2_NAME = CLASS_B_NAME.substring(0,CLASS_B_NAME.lastIndexOf('.'));
-    
+
+    private static final String CLASS_$X_NAME = $X.class.getName();
+    private static final String CLASS_$X_Y_NAME = $X.Y.class.getName();
+    private static final String CLASS_X$Y_NAME = X$Y.class.getName();
+
     private static final File CLASS_C_FILE = new File(COMPILATION_OUTPUT_DIR_PATH + "/" + slashed(CLASS_C_NAME) + ".class");
     private static final File PACKAGE_TEST1_FILE = new File(COMPILATION_OUTPUT_DIR_PATH + "/" + slashed(PACKAGE_TEST1_NAME));
     private static final File PACKAGE_TEST2_FILE = new File(COMPILATION_OUTPUT_DIR_PATH + "/" + slashed(PACKAGE_TEST2_NAME));
+
+    private static final File CLASS_$X_FILE = new File(COMPILATION_OUTPUT_DIR_PATH + "/" + slashed(CLASS_$X_NAME) + ".class");
+    private static final File CLASS_$X_Y_FILE = new File(COMPILATION_OUTPUT_DIR_PATH + "/" + slashed(CLASS_$X_Y_NAME) + ".class");
+    private static final File CLASS_X$Y_FILE = new File(COMPILATION_OUTPUT_DIR_PATH + "/" + slashed(CLASS_X$Y_NAME) + ".class");
 
     //--------------------------------------------------------------------------
     // PUBLIC METHODS
@@ -91,7 +103,7 @@ public class FsDepsParserTest extends TestCase {
         final ParsingFilters filters = ParsingFilters.defaultInstance();
         
         final PackageData defaultP = parser.getDefaultPackageData();
-        assertNull(defaultP.parent());
+        assertEquals(null, defaultP.parent());
         assertEquals(0, defaultP.childClassDataByFileNameNoExt().size());
         assertEquals(0, defaultP.childPackageDataByDirName().size());
         
@@ -256,7 +268,7 @@ public class FsDepsParserTest extends TestCase {
         // but has not been parsed so its byte size is 0.
         assertEquals(0, b.byteSize());
         // Nothing in p1 depends on C, so class data not created.
-        assertNull(c);
+        assertEquals(null, c);
     }
 
     public void test_accumulateDependencies_useOf_classFilenameFilter() {
@@ -288,7 +300,7 @@ public class FsDepsParserTest extends TestCase {
         final PackageData p1 = defaultP.getPackageData(PACKAGE_TEST1_NAME);
         final PackageData p2 = defaultP.getPackageData(PACKAGE_TEST2_NAME);
 
-        assertNull(p1);
+        assertEquals(null, p1);
         assertNotNull(p2);
 
         final ClassData b = p2.getClassData("B");
@@ -386,7 +398,7 @@ public class FsDepsParserTest extends TestCase {
         final PackageData p1 = defaultP.getPackageData(PACKAGE_TEST1_NAME);
         final PackageData p2 = defaultP.getPackageData(PACKAGE_TEST2_NAME);
 
-        assertNull(p1);
+        assertEquals(null, p1);
         assertNotNull(p2);
         
         final ClassData b = p2.getClassData("B");
@@ -533,15 +545,154 @@ public class FsDepsParserTest extends TestCase {
         // Nothing new parsed.
         assertFalse(parser.accumulateDependencies(toParse, filters));
     }
+    
+    /*
+     * 
+     */
+
+    public void test_dollarSign_$X_Y() {
+        if (!HANDLE_WEIRD_DOLLAR_SIGN_USAGES) {
+            return;
+        }
+
+        for (boolean apiOnly : new boolean[]{false,true}) {
+            
+            if (DEBUG) {
+                System.out.println("apiOnly = " + apiOnly);
+            }
+            
+            // Else ClassData for "$X" is created due to non-API dependency
+            // from "$X$Y" to its outer class "$X".
+
+            final FsDepsParser parser = newDepsParser(apiOnly);
+            final PackageData defaultP = parser.getDefaultPackageData();
+            final ParsingFilters filters = ParsingFilters.defaultInstance();
+
+            /*
+             * Parsing $X$Y.class.
+             */
+
+            assertTrue(parser.accumulateDependencies(CLASS_$X_Y_FILE, filters));
+
+            if (DEBUG) {
+                defaultP.printSubtree();
+            }
+
+            final ClassData x_y = defaultP.getClassData(CLASS_$X_Y_NAME);
+            assertEquals(CLASS_$X_Y_NAME, x_y.name());
+
+            // "$X$Y" interpreted as a top level class,
+            // due to having a weird class file name,
+            // even though it's actually a nested class.
+            assertEquals(null, x_y.outerClassData());
+
+            if (apiOnly) {
+                // No ClassData created for actual top level class "$X".
+                assertEquals(null, defaultP.getClassData(CLASS_$X_NAME));
+            } else {
+                // ClassData created due to non-API dependency
+                // to actual outer class.
+                final ClassData x = defaultP.getClassData(CLASS_$X_NAME);
+                assertNotNull(x);
+            }
+
+            // Dependencies.
+            final ClassData cObject = defaultP.getClassData(Object.class.getName());
+            final ClassData cString = defaultP.getClassData(String.class.getName());
+            assertEquals(apiOnly ? 2 : 3, x_y.successors().size());
+            assertTrue(x_y.successors().contains(cObject));
+            assertTrue(x_y.successors().contains(cString));
+            if (apiOnly) {
+            } else {
+                assertTrue(x_y.successors().contains(defaultP.getClassData(CLASS_$X_NAME)));
+            }
+
+            /*
+             * Parsing $X.class.
+             */
+
+            assertTrue(parser.accumulateDependencies(CLASS_$X_FILE, filters));
+
+            if (DEBUG) {
+                defaultP.printSubtree();
+            }
+
+            final ClassData x = defaultP.getClassData(CLASS_$X_NAME);
+            assertEquals(CLASS_$X_NAME, x.name());
+
+            // "$X$Y" still interpreted as a top level class.
+            assertEquals(null, x_y.outerClassData());
+
+            // Dependencies.
+            assertEquals(apiOnly ? 1 : 2, x.successors().size());
+            assertTrue(x.successors().contains(cObject));
+            if (apiOnly) {
+            } else {
+                // Non-API dependency to actual nested class.
+                assertTrue(x.successors().contains(x_y));
+            }
+            assertEquals(apiOnly ? 2 : 3, x_y.successors().size());
+            assertTrue(x_y.successors().contains(cObject));
+            assertTrue(x_y.successors().contains(cString));
+            if (apiOnly) {
+            } else {
+                assertTrue(x_y.successors().contains(x));
+            }
+        }
+    }
+
+    public void test_dollarSign_X$Y() {
+        if (!HANDLE_WEIRD_DOLLAR_SIGN_USAGES) {
+            return;
+        }
+
+        final FsDepsParser parser = newDepsParser();
+        final PackageData defaultP = parser.getDefaultPackageData();
+        final ParsingFilters filters = ParsingFilters.defaultInstance();
+
+        /*
+         * Parsing X$Y.class.
+         */
+        
+        assertTrue(parser.accumulateDependencies(CLASS_X$Y_FILE, filters));
+
+        if (DEBUG) {
+            defaultP.printSubtree();
+        }
+        
+        final ClassData xy = defaultP.getClassData(CLASS_X$Y_NAME);
+        assertEquals(CLASS_X$Y_NAME, xy.name());
+
+        // "X$Y" interpreted as a nested class,
+        // due to having a non-weird class file name,
+        // even though it's actually a top level class.
+        final ClassData x = xy.outerClassData();
+        assertNotNull(x);
+        
+        // Dependencies.
+        final ClassData cObject = defaultP.getClassData(Object.class.getName());
+        final ClassData cString = defaultP.getClassData(String.class.getName());
+        // "X" outer class created automatically due to "X$Y"
+        // being considered a nested class, but since no such
+        // class was parsed, it has zero dependency.
+        assertEquals(0, x.successors().size());
+        assertEquals(2, xy.successors().size());
+        assertTrue(xy.successors().contains(cObject));
+        assertTrue(xy.successors().contains(cString));
+    }
 
     //--------------------------------------------------------------------------
     // PRIVATE METHODS
     //--------------------------------------------------------------------------
 
     private static FsDepsParser newDepsParser() {
-        return new FsDepsParser(false, false);
+        return newDepsParser(false);
     }
 
+    private static FsDepsParser newDepsParser(boolean apiOnly) {
+        return new FsDepsParser(false, apiOnly);
+    }
+    
     private static String slashed(String name) {
         return NameUtils.slashed(name);
     }

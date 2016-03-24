@@ -58,9 +58,9 @@ public class WorkGraphUtilzTest extends TestCase {
                 // i.e. of indexes 0 and 2,
                 // i.e. of work-ids 1 and 3.
 
-                assertNull(wv1);
+                assertEquals(null, wv1);
                 assertNotNull(wv2);
-                assertNull(wv3);
+                assertEquals(null, wv3);
                 assertNotNull(wv4);
 
                 assertSame(v2, wv2.backingVertex());
@@ -106,8 +106,8 @@ public class WorkGraphUtilzTest extends TestCase {
                 assertEquals(2, workGraph.size());
                 assertNotNull(wv1);
                 assertNotNull(wv2);
-                assertNull(wv3);
-                assertNull(wv4);
+                assertEquals(null, wv3);
+                assertEquals(null, wv4);
 
                 assertEquals(1, wv1.successors().size());
                 assertTrue(wv1.successors().contains(wv2));
@@ -184,7 +184,7 @@ public class WorkGraphUtilzTest extends TestCase {
                 assertEquals(2, workGraph.size());
                 assertNotNull(wv1);
                 assertNotNull(wv2);
-                assertNull(wv3);
+                assertEquals(null, wv3);
 
                 assertEquals(1, wv1.successors().size());
                 assertTrue(wv1.successors().contains(wv2));

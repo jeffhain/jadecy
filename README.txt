@@ -10,6 +10,26 @@ Jadecy x.x, xxxx/xx/xx
 
 Changes since version 1.1:
 
+- Added handling of packages and classes names with dollar signs (other than
+  added by compiler before nested classes), as follows:
+  - Top level classes names are now properly computed even if the package name
+    contains a dollar sign.
+  - Classes names minus package, starting or ending with a dollar sign (like
+    "$" or "A$B$"), or containing two consecutive dollar signs (like "A$$B"),
+    are considered to be top level classes names.
+    For example, a nested class "B" in a top level class "$A" will be
+    considered to be the top level class "$A$B", but will still have (at least)
+    non-API dependency to its outer class "$A", even though
+    ClassData.outerClassData() will return null for "$A$B".
+  - Other ("regular") classes names minus package, will only be considered top
+    level classes if they contain no dollar sign.
+    For example, a top level class "A$B" will be considered to be the nested
+    class "B" of a top level class "A", which will therefore have a ClassData
+    created but with no dependency (as for any depended on but non parsed
+    class).
+  Note that as before, considered classes names are those read from within the
+  class files, whatever the names or paths of these class files.
+
 - Simplified some Comparable/Comparator implementations.
 
 - Added SplitPackageSample.
