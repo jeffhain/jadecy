@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016 Jeff Hain
+ * Copyright 2015-2019 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.jadecy.code;
+package net.jadecy.names;
 
 import java.util.ArrayList;
 
@@ -273,7 +273,7 @@ public class NameUtils {
      * @param subject A string.
      * @param beginName A name.
      * @return True if subject starts with the specified name,
-     *         i.e. always name is empty, else if name equals it,
+     *         i.e. always if name is empty, else if name equals it,
      *         or starts with it followed by '.' or '$'.
      * @throws NullPointerException if subject or beginName is null.
      */
@@ -298,7 +298,7 @@ public class NameUtils {
      * @param subject A string.
      * @param endName A name.
      * @return True if subject ends with the specified name,
-     *         i.e. always name is empty, else if name equals it,
+     *         i.e. always if name is empty, else if name equals it,
      *         or ends with it preceded by '.' or '$'.
      * @throws NullPointerException if subject or endName is null.
      */

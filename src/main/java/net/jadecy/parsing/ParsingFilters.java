@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2015 Jeff Hain
+ * Copyright 2015 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package net.jadecy.parsing;
 import java.io.File;
 import java.io.FilenameFilter;
 
-import net.jadecy.code.InterfaceNameFilter;
-import net.jadecy.code.NameFilters;
+import net.jadecy.names.InterfaceNameFilter;
+import net.jadecy.names.NameFilters;
 import net.jadecy.utils.ArgsUtils;
 
 /**

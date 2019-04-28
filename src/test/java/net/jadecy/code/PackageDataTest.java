@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2019 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package net.jadecy.code;
 import java.util.List;
 import java.util.SortedSet;
 
+import net.jadecy.names.NameUtils;
 import net.jadecy.tests.PrintTestUtils;
 import net.jadecy.utils.MemPrintStream;
 import junit.framework.TestCase;
@@ -27,6 +28,12 @@ import junit.framework.TestCase;
  * behavior coverage being shared with CodeDataSturdinessTest.
  */
 public class PackageDataTest extends TestCase {
+    
+    //--------------------------------------------------------------------------
+    // CONFIGURATION
+    //--------------------------------------------------------------------------
+    
+    private static final boolean MUST_HANDLE_WEIRD_DOLLAR_SIGN_USAGES = true;
 
     //--------------------------------------------------------------------------
     // PUBLIC METHODS
@@ -310,7 +317,7 @@ public class PackageDataTest extends TestCase {
             assertSame(c111, p1.getClassData("p11.c111"));
         }
 
-        if (NameUtils.HANDLE_WEIRD_DOLLAR_SIGN_USAGES) {
+        if (MUST_HANDLE_WEIRD_DOLLAR_SIGN_USAGES) {
             for (String className : new String[]{
                     "foo.bar.$",
                     "foo.bar.$$",
@@ -389,7 +396,7 @@ public class PackageDataTest extends TestCase {
             assertSame(p11, p1.getPackageData("p11"));
         }
         
-        if (NameUtils.HANDLE_WEIRD_DOLLAR_SIGN_USAGES) {
+        if (MUST_HANDLE_WEIRD_DOLLAR_SIGN_USAGES) {
             for (String n1 : new String[]{"$","a"}) {
                 for (String n2 : new String[]{"$","a"}) {
                     final String p1Name = n1;

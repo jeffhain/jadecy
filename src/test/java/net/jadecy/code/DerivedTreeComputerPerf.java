@@ -15,6 +15,10 @@
  */
 package net.jadecy.code;
 
+import net.jadecy.names.AbstractNameFilter;
+import net.jadecy.names.InterfaceNameFilter;
+import net.jadecy.names.NameFilters;
+
 public class DerivedTreeComputerPerf {
 
     //--------------------------------------------------------------------------

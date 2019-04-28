@@ -18,6 +18,7 @@ package net.jadecy.code;
 import java.util.Set;
 
 import net.jadecy.graph.InterfaceVertex;
+import net.jadecy.names.NameUtils;
 
 /**
  * Abstract class for data related to a class file or a package.

@@ -18,6 +18,7 @@ package net.jadecy.code;
 import java.util.Map;
 import java.util.Set;
 
+import net.jadecy.names.NameTestUtils;
 import junit.framework.TestCase;
 
 public class ClassDataTest extends TestCase {
@@ -150,7 +151,7 @@ public class ClassDataTest extends TestCase {
             // ok
         }
         
-        for (String bad : CodeTestUtils.newBadNames()) {
+        for (String bad : NameTestUtils.newBadNames()) {
             try {
                 new ClassData(defaultP, bad, null, null);
                 assertTrue(false);

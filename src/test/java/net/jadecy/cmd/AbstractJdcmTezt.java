@@ -18,7 +18,7 @@ package net.jadecy.cmd;
 import java.io.PrintStream;
 import java.util.List;
 
-import net.jadecy.code.NameUtils;
+import net.jadecy.names.NameUtils;
 import net.jadecy.utils.MemPrintStream;
 import net.jadecy.virtual.AbstractVirtualCodeGraphTezt;
 

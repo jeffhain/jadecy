@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Jeff Hain
+ * Copyright 2016-2019 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package net.jadecy.cmd;
 
-import net.jadecy.build.JadecyBuildConfig;
+import net.jadecy.JdcSamplesConfig;
 import net.jadecy.cmd.JadecyMain;
 
 /**
@@ -27,7 +27,7 @@ public class JadecyMainSample {
     // CONFIGURATION
     //--------------------------------------------------------------------------
     
-    private static final String JAVA_HOME = JadecyBuildConfig.getJdkHome();
+    private static final String JAVA_HOME = JdcSamplesConfig.getJdkHome();
     
     private static final String RT_JAR_PATH = JAVA_HOME + "/jre/lib/rt.jar";
     

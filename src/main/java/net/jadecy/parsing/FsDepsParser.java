@@ -30,9 +30,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import net.jadecy.code.ClassData;
-import net.jadecy.code.NameUtils;
-import net.jadecy.code.InterfaceNameFilter;
 import net.jadecy.code.PackageData;
+import net.jadecy.names.InterfaceNameFilter;
+import net.jadecy.names.NameUtils;
 import net.jadecy.utils.ArgsUtils;
 
 /**

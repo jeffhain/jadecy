@@ -23,8 +23,8 @@ import java.io.PrintStream;
 import java.util.Arrays;
 
 import net.jadecy.Jadecy;
-import net.jadecy.code.InterfaceNameFilter;
-import net.jadecy.code.NameFilters;
+import net.jadecy.names.InterfaceNameFilter;
+import net.jadecy.names.NameFilters;
 import net.jadecy.parsing.FsDepsParserFactory;
 import net.jadecy.parsing.InterfaceDepsParser;
 import net.jadecy.parsing.InterfaceDepsParserFactory;

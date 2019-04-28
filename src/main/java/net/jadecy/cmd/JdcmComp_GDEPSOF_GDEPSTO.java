@@ -25,7 +25,7 @@ import java.util.SortedSet;
 import net.jadecy.ElemType;
 import net.jadecy.Jadecy;
 import net.jadecy.JadecyUtils;
-import net.jadecy.code.NameFilters;
+import net.jadecy.names.NameFilters;
 
 class JdcmComp_GDEPSOF_GDEPSTO {
 

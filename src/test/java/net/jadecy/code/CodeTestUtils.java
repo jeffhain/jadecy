@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2019 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,25 +22,6 @@ public class CodeTestUtils {
     //--------------------------------------------------------------------------
     // PUBLIC METHODS
     //--------------------------------------------------------------------------
-
-    /**
-     * @return A new array of invalid class names, which are also invalid
-     *         package names (except for empty name which is a valid package
-     *         name).
-     */
-    public static String[] newBadNames() {
-        return new String[]{
-                "",
-                ".",
-                "..",
-                ".a",
-                "a.",
-                ".a.",
-                "..a",
-                "a..",
-                "a..a",
-        };
-    }
     
     /**
      * @return The new mod count.

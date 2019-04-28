@@ -20,6 +20,8 @@ import java.util.Collection;
 import java.util.List;
 
 import net.jadecy.graph.InterfaceVertex;
+import net.jadecy.names.InterfaceNameFilter;
+import net.jadecy.names.NameFilters;
 import net.jadecy.utils.ArgsUtils;
 
 /**

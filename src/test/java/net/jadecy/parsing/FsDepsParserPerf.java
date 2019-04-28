@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2019 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package net.jadecy.parsing;
 
 import java.io.File;
 
-import net.jadecy.tests.JdcTestCompHelper;
+import net.jadecy.tests.JdcTestConfig;
 
 public class FsDepsParserPerf {
 
@@ -27,7 +27,9 @@ public class FsDepsParserPerf {
 
     private static final int NBR_OF_RUNS = 4;
 
-    private static final String RT_JAR_FILE_PATH = JdcTestCompHelper.JAVA_HOME + "/jre/lib/rt.jar";
+    private static final String JAVA_HOME = JdcTestConfig.getJdk8Home();
+    
+    private static final String RT_JAR_FILE_PATH = JAVA_HOME + "/jre/lib/rt.jar";
 
     //--------------------------------------------------------------------------
     // PUBLIC METHODS

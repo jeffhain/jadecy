@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.jadecy.code;
+package net.jadecy.names;
 
+import net.jadecy.names.InterfaceNameFilter;
+import net.jadecy.names.NameFilters;
 import junit.framework.TestCase;
 
 public class NameFiltersTest extends TestCase {

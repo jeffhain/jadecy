@@ -21,6 +21,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 import net.jadecy.graph.InterfaceVertex;
+import net.jadecy.names.NameFilters;
 
 public class CodeDataUtilsTest extends TestCase {
 

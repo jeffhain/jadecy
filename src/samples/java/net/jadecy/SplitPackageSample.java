@@ -1,3 +1,18 @@
+/*
+ * Copyright 2016-2019 Jeff Hain
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package net.jadecy;
 
 import java.io.File;
@@ -11,11 +26,10 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import net.jadecy.build.JadecyBuildConfig;
-import net.jadecy.code.AbstractNameFilter;
-import net.jadecy.code.InterfaceNameFilter;
-import net.jadecy.code.NameFilters;
-import net.jadecy.code.NameUtils;
+import net.jadecy.names.AbstractNameFilter;
+import net.jadecy.names.InterfaceNameFilter;
+import net.jadecy.names.NameFilters;
+import net.jadecy.names.NameUtils;
 import net.jadecy.parsing.ParsingFilters;
 
 /**
@@ -27,7 +41,7 @@ public class SplitPackageSample {
     // CONFIGURATION
     //--------------------------------------------------------------------------
 
-    private static final String JAVA_HOME = JadecyBuildConfig.getJdkHome();
+    private static final String JAVA_HOME = JdcSamplesConfig.getJdkHome();
 
     //--------------------------------------------------------------------------
     // PRIVATE CLASSES

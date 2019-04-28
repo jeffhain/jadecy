@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.jadecy.code;
+package net.jadecy.names;
 
 import net.jadecy.utils.ArgsUtils;
 

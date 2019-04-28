@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2019 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,12 @@ package net.jadecy.allx;
 
 import net.jadecy.code.DerivedTreeComputerPerf;
 import net.jadecy.code.CodeDataUtilsPerf;
-import net.jadecy.code.NameFiltersPerf;
-import net.jadecy.code.NameUtilsPerf;
 import net.jadecy.graph.CyclesComputersPerf;
 import net.jadecy.graph.OneShortestPathComputerPerf;
 import net.jadecy.graph.ReachabilityComputerPerf;
 import net.jadecy.graph.SccsComputerPerf;
+import net.jadecy.names.NameFiltersPerf;
+import net.jadecy.names.NameUtilsPerf;
 import net.jadecy.parsing.FsDepsParserPerf;
 import net.jadecy.utils.QuietSortPerf;
 
@@ -40,8 +40,6 @@ public class AllPerfs {
         
         CodeDataUtilsPerf.newRun(args);
         DerivedTreeComputerPerf.newRun(args);
-        NameFiltersPerf.newRun(args);
-        NameUtilsPerf.newRun(args);
         
         /*
          * net.jadecy.graph
@@ -51,6 +49,13 @@ public class AllPerfs {
         OneShortestPathComputerPerf.newRun(args);
         ReachabilityComputerPerf.newRun(args);
         SccsComputerPerf.newRun(args);
+        
+        /*
+         * net.jadecy.names
+         */
+        
+        NameFiltersPerf.newRun(args);
+        NameUtilsPerf.newRun(args);
         
         /*
          * net.jadecy.parsing

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2019 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,22 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.jadecy.build;
+package net.jadecy;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
 /**
- * Installation related build configuration.
+ * Installation related samples configuration.
  */
-public class JadecyBuildConfig {
+public class JdcSamplesConfig {
 
     //--------------------------------------------------------------------------
     // MEMBERS
     //--------------------------------------------------------------------------
 
-    private static final String CONFIG_FILE_PATH = "src/build/resources/build_config.properties";
+    private static final String CONFIG_FILE_PATH = "src/samples/resources/samples_config.properties";
     
     private static final Properties PROPERTIES = new Properties();
     static {
@@ -56,6 +56,6 @@ public class JadecyBuildConfig {
     // PRIVATE METHODS
     //--------------------------------------------------------------------------
     
-    private JadecyBuildConfig() {
+    private JdcSamplesConfig() {
     }
 }

@@ -25,10 +25,10 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 
 import net.jadecy.code.ClassData;
-import net.jadecy.code.InterfaceNameFilter;
-import net.jadecy.code.NameFilters;
-import net.jadecy.code.NameUtils;
 import net.jadecy.code.PackageData;
+import net.jadecy.names.InterfaceNameFilter;
+import net.jadecy.names.NameFilters;
+import net.jadecy.names.NameUtils;
 import net.jadecy.parsing.FsDepsParser;
 import net.jadecy.parsing.InterfaceDepsParser;
 import net.jadecy.parsing.ParsingFilters;

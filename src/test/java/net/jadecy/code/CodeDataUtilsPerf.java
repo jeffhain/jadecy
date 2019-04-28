@@ -18,6 +18,9 @@ package net.jadecy.code;
 import java.util.List;
 
 import net.jadecy.graph.InterfaceVertex;
+import net.jadecy.names.AbstractNameFilter;
+import net.jadecy.names.InterfaceNameFilter;
+import net.jadecy.names.NameFilters;
 
 public class CodeDataUtilsPerf {
 

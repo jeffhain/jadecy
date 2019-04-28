@@ -18,6 +18,7 @@ package net.jadecy.code;
 import java.util.List;
 
 import junit.framework.TestCase;
+import net.jadecy.names.NameFilters;
 import net.jadecy.tests.PrintTestUtils;
 import net.jadecy.utils.MemPrintStream;
 

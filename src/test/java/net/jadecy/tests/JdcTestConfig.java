@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2019 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ public class JdcTestConfig {
     // MEMBERS
     //--------------------------------------------------------------------------
 
-    private static final String CONFIG_FILE_PATH = "src/test/resources/config.properties";
+    private static final String CONFIG_FILE_PATH = "src/test/resources/test_config.properties";
     
     private static final Properties PROPERTIES = new Properties();
     static {

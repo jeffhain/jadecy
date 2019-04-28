@@ -19,9 +19,9 @@ import java.io.File;
 import java.util.ArrayList;
 
 import net.jadecy.code.ClassData;
-import net.jadecy.code.InterfaceNameFilter;
-import net.jadecy.code.NameFilters;
 import net.jadecy.code.PackageData;
+import net.jadecy.names.InterfaceNameFilter;
+import net.jadecy.names.NameFilters;
 import net.jadecy.parsing.InterfaceDepsParser;
 import net.jadecy.parsing.ParsingFilters;
 import net.jadecy.utils.MemPrintStream;

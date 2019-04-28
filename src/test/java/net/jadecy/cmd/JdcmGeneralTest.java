@@ -17,7 +17,7 @@ package net.jadecy.cmd;
 
 import java.util.Arrays;
 
-import net.jadecy.code.NameUtils;
+import net.jadecy.names.NameUtils;
 import net.jadecy.utils.MemPrintStream;
 
 /**

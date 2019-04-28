@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2019 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.jadecy.code;
 
 /**
- * Optional abstract class for name filters, providing a default
- * non-restrictive getPrefix() method.
+ * Contains names filters, for classes or packages names,
+ * using '.' and at some points '$' separators.
+ * 
+ * Can also be used for relative files names, if replacing '/' with '.'.
+ * 
+ * Principal classes:
+ * - NameFilters: Filters for defining sets of classes or packages.
  */
-public abstract class AbstractNameFilter implements InterfaceNameFilter {
-
-    //@Override
-    public String getPrefix() {
-        return "";
-    }
-}
+package net.jadecy.names;

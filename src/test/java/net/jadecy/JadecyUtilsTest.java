@@ -24,7 +24,7 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import net.jadecy.code.NameUtils;
+import net.jadecy.names.NameUtils;
 import net.jadecy.tests.PrintTestUtils;
 import net.jadecy.utils.MemPrintStream;
 import junit.framework.TestCase;

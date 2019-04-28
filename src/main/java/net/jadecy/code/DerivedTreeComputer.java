@@ -18,6 +18,8 @@ package net.jadecy.code;
 import java.util.Map;
 import java.util.SortedSet;
 
+import net.jadecy.names.InterfaceNameFilter;
+import net.jadecy.names.NameFilters;
 import net.jadecy.utils.ArgsUtils;
 
 /**

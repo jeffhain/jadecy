@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2019 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package net.jadecy.comp;
 import java.io.File;
 import java.io.IOException;
 
-public class FileSystemHelper {
+public class JdcFsUtils {
 
     //--------------------------------------------------------------------------
     // CONFIGURATION
@@ -32,15 +32,15 @@ public class FileSystemHelper {
     
     /**
      * Deletes all files in the specified directory, recursively.
+     * If the specified file is not a directory, does nothing.
      * 
-     * @param dirPath Path of the directory to clear. The directory itself
-     *        is not deleted.
+     * @param dir Directory to clear. The directory itself is not deleted.
      */
-    public static void clearDir(String dirPath) {
+    public static void clearDir(File dir) {
+        final String dirPath = dir.getAbsolutePath();
         if (DEBUG) {
             System.out.println("clearDir(" + dirPath + ")");
         }
-        final File dir = new File(dirPath);
         final String[] childList = dir.list();
         if (childList == null) {
             return;
@@ -48,13 +48,49 @@ public class FileSystemHelper {
         for (String childName : childList) {
             final File child = new File(dirPath + "/" + childName);
             if (child.isDirectory()) {
-                clearDir(child.getAbsolutePath());
+                clearDir(child);
             }
             final boolean didIt = child.delete();
             if (!didIt) {
                 throw new RuntimeException("could not delete " + child.getAbsolutePath());
             }
         }
+    }
+
+    /**
+     * Can attempt to create parent directories,
+     * but does not try more brutal actions (such as deleting a file).
+     * 
+     * @param dir Directory to ensure exists.
+     * @throws RuntimeException if could not ensure directory existence.
+     */
+    public static void ensureDir(File dir) {
+        final String dirPath = dir.getAbsolutePath();
+        if (DEBUG) {
+            System.out.println("ensureEmptyDir(" + dirPath + ")");
+        }
+        if (dir.exists()) {
+            if (!dir.isDirectory()) {
+                throw new RuntimeException("directory to ensure already exists as a file: " + dir.getAbsolutePath());
+            }
+        } else {
+            final boolean didIt = dir.mkdirs();
+            if (!didIt) {
+                throw new RuntimeException("could not create directory: " + dirPath);
+            }
+        }
+    }
+
+    /**
+     * Can attempt to create parent directories,
+     * but does not try more brutal actions (such as deleting a file).
+     * 
+     * @param dir Directory to ensure exists and is empty.
+     * @throws RuntimeException if could not ensure directory existence and emptiness.
+     */
+    public static void ensureEmptyDir(File dir) {
+        ensureDir(dir);
+        clearDir(dir);
     }
 
     /**
@@ -83,14 +119,7 @@ public class FileSystemHelper {
             // Creating parent directory if any and it doesn't exist.
             final File parentDir = file.getParentFile();
             if (parentDir != null) {
-                if (!parentDir.exists()) {
-                    final boolean didIt = parentDir.mkdirs();
-                    if (!didIt) {
-                        throw new RuntimeException("could not create parent directory: " + parentDir.getAbsolutePath());
-                    }
-                } else if (!parentDir.isDirectory()) {
-                    throw new RuntimeException("parent directory already exists not as a directory: " + parentDir.getAbsolutePath());
-                }
+                ensureDir(parentDir);
             }
         }
 
@@ -109,6 +138,6 @@ public class FileSystemHelper {
     // PRIVATE METHODS
     //--------------------------------------------------------------------------
     
-    private FileSystemHelper() {
+    private JdcFsUtils() {
     }
 }

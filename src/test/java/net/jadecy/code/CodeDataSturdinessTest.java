@@ -26,6 +26,10 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import net.jadecy.names.AbstractNameFilter;
+import net.jadecy.names.InterfaceNameFilter;
+import net.jadecy.names.NameFilters;
+import net.jadecy.names.NameUtils;
 import junit.framework.TestCase;
 
 /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 Jeff Hain
+ * Copyright 2019 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,38 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.jadecy.comp;
+package net.jadecy.names;
 
-public class PathHelper {
+public class NameTestUtils {
 
     //--------------------------------------------------------------------------
     // PUBLIC METHODS
     //--------------------------------------------------------------------------
-    
-    /**
-     * Useful for example for jdeps, which doesn't like file paths with spaces
-     * if they are not in double quotes.
-     * 
-     * @param path A path.
-     * @return The specified path in double quotes, with eventual anti slashes
-     *         and double quotes escaped.
-     */
-    public static String quoted(String path) {
-        // NB: To get "\", must write "\\", or "\\\\" in a regex.
-        
-        // Replacing "\" with "\\".
-        path = path.replaceAll("\\\\", "\\\\\\\\");
-        
-        // Replacing """ with "\"".
-        path = path.replaceAll("\"", "\\\\\"");
-        
-        return "\"" + path + "\"";
-    }
 
+    /**
+     * @return A new array of invalid class names, which are also invalid
+     *         package names (except for empty name which is a valid package
+     *         name).
+     */
+    public static String[] newBadNames() {
+        return new String[]{
+                "",
+                ".",
+                "..",
+                ".a",
+                "a.",
+                ".a.",
+                "..a",
+                "a..",
+                "a..a",
+        };
+    }
+    
     //--------------------------------------------------------------------------
     // PRIVATE METHODS
     //--------------------------------------------------------------------------
-    
-    private PathHelper() {
+
+    private NameTestUtils() {
     }
 }

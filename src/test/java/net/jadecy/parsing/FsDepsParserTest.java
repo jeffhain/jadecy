@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2019 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,14 @@ package net.jadecy.parsing;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import junit.framework.TestCase;
 import net.jadecy.code.ClassData;
-import net.jadecy.code.NameFilters;
-import net.jadecy.code.NameUtils;
 import net.jadecy.code.PackageData;
+import net.jadecy.names.NameFilters;
+import net.jadecy.names.NameUtils;
 import net.jadecy.parsing.test$.$X;
 import net.jadecy.parsing.test$.X$Y;
 import net.jadecy.parsing.test1.A;
@@ -41,8 +42,9 @@ public class FsDepsParserTest extends TestCase {
 
     private static final String COMPILATION_OUTPUT_DIR_PATH =
             JdcTestCompHelper.ensureCompiledAndGetOutputDirPath(
-                    JdcTestCompHelper.MAIN_SRC_PATH,
-                    JdcTestCompHelper.TEST_SRC_PATH);
+                    Arrays.asList(
+                            JdcTestCompHelper.MAIN_SRC_PATH,
+                            JdcTestCompHelper.TEST_SRC_PATH));
     
     private static final boolean HANDLE_WEIRD_DOLLAR_SIGN_USAGES = true;
 

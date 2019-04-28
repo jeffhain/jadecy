@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.jadecy.names.NameUtils;
 import junit.framework.TestCase;
 
 public class AbstractCodeDataTest extends TestCase {

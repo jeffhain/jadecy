@@ -25,6 +25,7 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import net.jadecy.names.NameUtils;
 import net.jadecy.utils.ArgsUtils;
 
 /**

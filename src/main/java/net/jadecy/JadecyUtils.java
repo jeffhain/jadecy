@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2015 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +27,7 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import net.jadecy.code.NameUtils;
+import net.jadecy.names.NameUtils;
 import net.jadecy.utils.ArgsUtils;
 
 /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016 Jeff Hain
+ * Copyright 2015-2019 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,15 @@
 package net.jadecy.allx;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
 import junit.framework.TestCase;
 import net.jadecy.DepUnit;
 import net.jadecy.ElemType;
 import net.jadecy.Jadecy;
-import net.jadecy.code.InterfaceNameFilter;
-import net.jadecy.code.NameFilters;
+import net.jadecy.names.InterfaceNameFilter;
+import net.jadecy.names.NameFilters;
 import net.jadecy.parsing.ParsingFilters;
 import net.jadecy.parsing.test1.A;
 import net.jadecy.parsing.test2.B;
@@ -49,7 +51,7 @@ public class DepsTest extends TestCase {
      */
     
     public void testPackagesDeps_main() {
-        final DepUnit depUnit = newDepUnit(JdcTestCompHelper.MAIN_SRC_PATH);
+        final DepUnit depUnit = newDepUnit(Arrays.asList(JdcTestCompHelper.MAIN_SRC_PATH));
         final ElemType elemType = ElemType.PACKAGE;
 
         depUnit.addAllowedDirectDeps(
@@ -61,6 +63,7 @@ public class DepsTest extends TestCase {
                     NameFilters.startsWithName("java.io"),
                     NameFilters.startsWithName("net.jadecy.code"),
                     NameFilters.startsWithName("net.jadecy.graph"),
+                    NameFilters.startsWithName("net.jadecy.names"),
                     NameFilters.startsWithName("net.jadecy.parsing"),
                     NameFilters.startsWithName("net.jadecy.utils"),
                 });
@@ -74,6 +77,7 @@ public class DepsTest extends TestCase {
                     NameFilters.startsWithName("java.io"),
                     NameFilters.equalsName("net.jadecy"),
                     NameFilters.startsWithName("net.jadecy.code"),
+                    NameFilters.startsWithName("net.jadecy.names"),
                     NameFilters.startsWithName("net.jadecy.parsing"),
                     NameFilters.startsWithName("net.jadecy.utils"),
                 });
@@ -85,8 +89,9 @@ public class DepsTest extends TestCase {
                     NameFilters.startsWithName("java.lang"),
                     NameFilters.startsWithName("java.util"),
                     NameFilters.startsWithName("java.io"),
-                    NameFilters.startsWithName("net.jadecy.utils"),
                     NameFilters.startsWithName("net.jadecy.graph"),
+                    NameFilters.startsWithName("net.jadecy.names"),
+                    NameFilters.startsWithName("net.jadecy.utils"),
                 });
 
         depUnit.addAllowedDirectDeps(
@@ -96,6 +101,9 @@ public class DepsTest extends TestCase {
                     NameFilters.startsWithName("java.lang"),
                     NameFilters.startsWithName("java.util"),
                     NameFilters.startsWithName("java.io"),
+                    NameFilters.startsWithName("java.nio"),
+                    NameFilters.startsWithName("javax.tools"),
+                    NameFilters.startsWithName("net.jadecy.names"),
                     NameFilters.startsWithName("net.jadecy.utils"),
                 });
 
@@ -115,8 +123,9 @@ public class DepsTest extends TestCase {
                     NameFilters.startsWithName("java.lang"),
                     NameFilters.startsWithName("java.util"),
                     NameFilters.startsWithName("java.io"),
-                    NameFilters.startsWithName("net.jadecy.utils"),
                     NameFilters.startsWithName("net.jadecy.code"),
+                    NameFilters.startsWithName("net.jadecy.names"),
+                    NameFilters.startsWithName("net.jadecy.utils"),
                 });
 
         depUnit.addAllowedDirectDeps(
@@ -136,8 +145,7 @@ public class DepsTest extends TestCase {
      */
     
     public void testClassesCycles_all() {
-        final DepUnit depUnit = newDepUnit(
-                JdcTestCompHelper.newAllSrcDirPathArr());
+        final DepUnit depUnit = newDepUnit(JdcTestCompHelper.ALL_SRC_PATH_LIST);
         final ElemType elemType = ElemType.CLASS;
 
         /*
@@ -173,8 +181,7 @@ public class DepsTest extends TestCase {
     }
     
     public void testPackagesCycles_all() {
-        final DepUnit depUnit = newDepUnit(
-                JdcTestCompHelper.newAllSrcDirPathArr());
+        final DepUnit depUnit = newDepUnit(JdcTestCompHelper.ALL_SRC_PATH_LIST);
         final ElemType elemType = ElemType.PACKAGE;
         
         depUnit.addAllowedCycle(
@@ -194,8 +201,8 @@ public class DepsTest extends TestCase {
     /**
      * @return Jadecy with parsing done.
      */
-    private static Jadecy newJadecy(String... srcDirPathArr) {
-        final String compDirPath = JdcTestCompHelper.ensureCompiledAndGetOutputDirPath(srcDirPathArr);
+    private static Jadecy newJadecy(List<String> srcDirPathList) {
+        final String compDirPath = JdcTestCompHelper.ensureCompiledAndGetOutputDirPath(srcDirPathList);
 
         // We don't care about intra-class cycles.
         final boolean mustMergeNestedClasses = true;
@@ -212,7 +219,7 @@ public class DepsTest extends TestCase {
         return jadecy;
     }
     
-    private static DepUnit newDepUnit(String... srcDirPathArr) {
-        return new DepUnit(newJadecy(srcDirPathArr));
+    private static DepUnit newDepUnit(List<String> srcDirPathList) {
+        return new DepUnit(newJadecy(srcDirPathList));
     }
 }

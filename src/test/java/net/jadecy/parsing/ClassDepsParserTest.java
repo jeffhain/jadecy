@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2019 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +32,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import junit.framework.TestCase;
-import net.jadecy.comp.FileSystemHelper;
+import net.jadecy.comp.JdcFsUtils;
 import net.jadecy.parsing.test$.$;
 import net.jadecy.parsing.test$.$$;
 import net.jadecy.parsing.test$.$A;
@@ -40,6 +41,7 @@ import net.jadecy.parsing.test$.A$$B;
 import net.jadecy.parsing.testp.TestAnno1;
 import net.jadecy.parsing.testp.TestAnno2;
 import net.jadecy.tests.JdcTestCompHelper;
+import net.jadecy.tests.JdcTestConfig;
 
 public class ClassDepsParserTest extends TestCase {
 
@@ -51,16 +53,19 @@ public class ClassDepsParserTest extends TestCase {
 
     private static final String COMPILATION_OUTPUT_DIR_PATH =
             JdcTestCompHelper.ensureCompiledAndGetOutputDirPath(
-                    JdcTestCompHelper.MAIN_SRC_PATH,
-                    JdcTestCompHelper.TEST_SRC_PATH);
+                    Arrays.asList(
+                            JdcTestCompHelper.MAIN_SRC_PATH,
+                            JdcTestCompHelper.TEST_SRC_PATH));
 
     private static final boolean COMPARE_WITH_JDEPS = false;
 
+    private static final String JAVA_HOME = JdcTestConfig.getJdk8Home();
+    
     /**
      * We don't necessarily want to compute same dependencies than jdeps,
      * but jdeps output can give hints.
      */
-    private static final String JDEPS = JdcTestCompHelper.JAVA_HOME + "/bin/jdeps";
+    private static final String JDEPS = JAVA_HOME + "/bin/jdeps";
     
     /**
      * TODO cf. https://bugs.openjdk.java.net/browse/JDK-8136419.
@@ -91,7 +96,7 @@ public class ClassDepsParserTest extends TestCase {
 
         final String classFilePath = getClassFilePath(className);
         final File emptyClassFile = new File(classFilePath);
-        FileSystemHelper.ensureEmptyFile(emptyClassFile);
+        JdcFsUtils.ensureEmptyFile(emptyClassFile);
 
         /*
          * 

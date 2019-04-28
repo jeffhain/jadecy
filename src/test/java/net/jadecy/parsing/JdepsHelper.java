@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2019 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package net.jadecy.parsing;
 import java.util.Collection;
 
 import net.jadecy.comp.PathHelper;
-import net.jadecy.comp.RuntimeExecHelper;
 import net.jadecy.utils.MemPrintStream;
 
 /**

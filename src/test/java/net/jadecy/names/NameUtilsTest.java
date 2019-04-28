@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.jadecy.code;
+package net.jadecy.names;
 
 import java.util.Arrays;
 
+//import net.jadecy.code.CodeTestUtils;
+import net.jadecy.names.NameUtils;
 import junit.framework.TestCase;
 
 public class NameUtilsTest extends TestCase {
@@ -258,7 +260,7 @@ public class NameUtilsTest extends TestCase {
             // ok
         }
         
-        for (String bad : CodeTestUtils.newBadNames()) {
+        for (String bad : NameTestUtils.newBadNames()) {
             
             if (DEBUG) {
                 System.out.println("bad = " + bad);

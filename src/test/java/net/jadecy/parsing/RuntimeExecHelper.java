@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2019 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.jadecy.comp;
+package net.jadecy.parsing;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,6 +39,7 @@ public class RuntimeExecHelper {
     //--------------------------------------------------------------------------
 
     public interface InterfaceExecution {
+        public Process getProcess();
         public InterfaceStreamReader getOutReader();
         public InterfaceStreamReader getErrReader();
         public int waitFor() throws InterruptedException;
@@ -173,6 +174,10 @@ public class RuntimeExecHelper {
             this.errReader = errReader;
         }
         //@Override
+        public Process getProcess() {
+            return this.process;
+        }
+        //@Override
         public InterfaceStreamReader getOutReader() {
             return this.outReader;
         }
@@ -181,25 +186,16 @@ public class RuntimeExecHelper {
             return this.errReader;
         }
         /**
-         * Causes the current thread to wait, if necessary, until the process
-         * has terminated.
-         * This method returns immediately if the subprocess has already
-         * terminated.
-         *
-         * @return The exit value of the subprocess. By convention, zero
-         *         indicates normal termination.
-         * @throws InterruptedException if the wait is interrupted.
+         * Shortcut for getProcess().waitFor().
          */
+        //@Override
         public int waitFor() throws InterruptedException {
             return this.process.waitFor();
         }
         /**
-         * Returns the exit value for the subprocess.
-         *
-         * @return The exit value of the subprocess.
-         * @throws IllegalThreadStateException if the subprocess has not yet
-         *         terminated.
+         * Shortcut for getProcess().exitValue().
          */
+        //@Override
         public int exitValue() {
             return this.process.exitValue();
         }
@@ -316,7 +312,7 @@ public class RuntimeExecHelper {
     public static int waitForNoIE(InterfaceExecution execution) {
         int value = Integer.MIN_VALUE;
         try {
-            value = execution.waitFor();
+            value = execution.getProcess().waitFor();
         } catch (InterruptedException e) {
             // OK we stop.
             Thread.currentThread().interrupt();

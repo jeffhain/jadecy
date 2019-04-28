@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016 Jeff Hain
+ * Copyright 2015-2019 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,9 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 
-import net.jadecy.code.InterfaceNameFilter;
-import net.jadecy.code.NameFilters;
 import net.jadecy.graph.CyclesUtils;
+import net.jadecy.names.InterfaceNameFilter;
+import net.jadecy.names.NameFilters;
 import net.jadecy.utils.ArgsUtils;
 import net.jadecy.utils.ComparableArrayList;
 
@@ -291,7 +291,8 @@ public class DepUnit {
              */
 
             final boolean mustIncludeBeginSet = false;
-            final boolean mustIncludeDepsToBeginSet = false;
+            // True to check dependencies to elements in begin set.
+            final boolean mustIncludeDepsToBeginSet = true;
             // Only checking direct dependencies.
             final int maxSteps = 1;
             final Set<String> depSet = JadecyUtils.computeDepsMergedFromDepsLm(
@@ -339,10 +340,14 @@ public class DepUnit {
                                     + dep
                                     + ":");
 
+                    final InterfaceNameFilter filterFromWithoutBadDep =
+                            NameFilters.and(
+                                    filterFrom,
+                                    NameFilters.not(NameFilters.equalsName(dep)));
                     final List<SortedMap<String,SortedSet<String>>> depCausesByNameList =
                             this.jadecy.computeOneShortestPath(
                                     elemType,
-                                    filterFrom,
+                                    filterFromWithoutBadDep,
                                     NameFilters.equalsName(dep));
                     final boolean mustPrintCauses = true;
                     JadecyUtils.printPathLms(
