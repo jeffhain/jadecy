@@ -1,0 +1,102 @@
+################################################################################
+Jadecy 2.0, 2019/04/28
+
+- Corrected bug in DepUnit, where checkDeps(...) method would ignore
+  dependencies to elements (classes or packages) contained within
+  begin elements set ("mustIncludeDepsToBeginSet" was false instead of true).
+
+- Moved name utilities in the new net.jadecy.names package.
+
+- In net.jadecy.comp package, use of JavaCompiler and JarOutputStream instead
+  of javac and jar executables, and API rework/cleanup.
+  As a result, JavacHelper class now requires Java 6+.
+
+- Aligned src/build code on Jafama 2.3.1 src/build
+  (for homogeneity, and for https://github.com/jeffhain/jafama/issues/4).
+  The main builds the jar with JavaCompiler and JarOutputStream (was previously
+  built using JDK5 javac and jar executables).
+  Also now compiled with "-g:vars" option, for proper arguments names instead
+  of arg0, arg1, etc., and the manifest contains the implementation version.
+
+- Removed AllTests class (instead just launch tests from the IDE project).
+
+- Restored @Override annotations (were causing issue with bad IDE config).
+
+- Comments upgrades.
+
+- Moved change log from README to the new CHANGELOG.txt file,
+  and changed README to use Markdown.
+
+################################################################################
+Jadecy 1.1.1, 2016/03/24
+
+- Added handling of packages and classes names with dollar signs (other than
+  added by compiler before nested classes), as follows:
+  - Top level classes names are now properly computed even if the package name
+    contains a dollar sign.
+  - Classes names minus package, starting or ending with a dollar sign (like
+    "$" or "A$B$"), or containing two consecutive dollar signs (like "A$$B"),
+    are considered to be top level classes names.
+    For example, a nested class "B" in a top level class "$A" will be
+    considered to be the top level class "$A$B", but will still have (at least)
+    non-API dependency to its outer class "$A", even though
+    ClassData.outerClassData() will return null for "$A$B".
+  - Other ("regular") classes names minus package, will only be considered top
+    level classes if they contain no dollar sign.
+    For example, a top level class "A$B" will be considered to be the nested
+    class "B" of a top level class "A", which will therefore have a ClassData
+    created but with no dependency (as for any depended on but non parsed
+    class).
+  Note that as before, considered classes names are those read from within the
+  class files, whatever the names or paths of these class files.
+
+- Simplified some Comparable/Comparator implementations.
+
+- Added SplitPackageSample.
+
+################################################################################
+Jadecy 1.1, 2016/01/02
+
+- Added ShortestCyclesComputer, which computes shortest cycles covering all
+  edges of each SCC.
+  It uses the cycle detection algorithm described in the paper "Efficient
+  Retrieval and Ranking of Undesired Package Cycles in Large Software Systems",
+  by Jannik Laval, Jean-Remy Falleri, Philippe Vismara, and Stephane Ducasse
+  (cf. http://www.jot.fm/issues/issue_2012_04/article4.pdf),
+  modulo some optimizations that can greatly speed things up, for example in
+  case of a single but long cycle, and usually reduce the amount of cycles found
+  for covering SCCs edges.
+  This new algorithm makes SomeCyclesComputer, and maybe also CyclesComputer,
+  mostly obsolete in practice for hunting down cycles, since it's both fast and
+  covers all edges of SCCs.
+
+- Added Jadecy.computeShortestCycles(...).
+
+- Added DepUnit.checkShortestCycles(...), for user not having to explicitly
+  allow all actual acceptable cycles as with checkCycles(...) method.
+
+- For JadecyMain, added -scycles computation (for shortest cycles),
+  and -minsize option for SCCs and cycles.
+  
+- Added JadecyMain.runArgs(...), for flexible programmatic usage of JadecyMain.
+
+- Added JadecyMainSample and sample_scycles.bat.
+
+- Added tracking of src/build with git.
+
+- Various javadoc, internal code and comments cleanups and improvements that
+  are not really worth mentioning.
+
+################################################################################
+Jadecy 1.0, 2015/12/13
+
+- License: Apache License V2.0.
+
+- Main sources require Java 1.5 or later, tests sources require Java 1.8
+  or later for testing higher versions features.
+
+- Handles class files of major version <= 52 (Java 8), and does best effort
+  if major version is higher.
+  Could compute dependencies out of JDK 9 ea build 95 class files.
+
+################################################################################
