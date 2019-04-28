@@ -71,15 +71,15 @@ class RefShortestCyclesComputer {
             this.maxSize = maxSize;
             this.processor = processor;
         }
-        //@Override
+        @Override
         public void processCollBegin() {
             this.tmpScc.clear();
         }
-        //@Override
+        @Override
         public void processCollVertex(InterfaceVertex vertex) {
             this.tmpScc.add(vertex);
         }
-        //@Override
+        @Override
         public boolean processCollEnd() {
             return computeShortestCycles_onScc(
                     this.tmpScc,

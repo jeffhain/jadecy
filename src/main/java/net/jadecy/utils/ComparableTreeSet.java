@@ -47,7 +47,7 @@ public class ComparableTreeSet<T extends Comparable<T>> extends TreeSet<T> imple
         super(c);
     }
     
-    //@Override
+    @Override
     public int compareTo(ComparableTreeSet<T> other) {
         final int aSize = this.size();
         final int bSize = other.size();

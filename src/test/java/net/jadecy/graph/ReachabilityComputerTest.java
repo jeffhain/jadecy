@@ -88,14 +88,14 @@ public class ReachabilityComputerTest extends TestCase {
         public String toString() {
             return "[step list list = " + this.stepListList + "]";
         }
-        //@Override
+        @Override
         public void processCollBegin() {
             assertTrue((this.callList.size() == 0) || (this.getLastCall() == END));
             this.callList.add(BEGIN);
             this.stepListList.add(new ArrayList<InterfaceVertex>());
             this.collPrev = null;
         }
-        //@Override
+        @Override
         public void processCollVertex(InterfaceVertex vertex) {
             assertTrue((this.getLastCall() == BEGIN) || (this.getLastCall() == PROCESS));
             this.callList.add(PROCESS);
@@ -117,7 +117,7 @@ public class ReachabilityComputerTest extends TestCase {
                 assertTrue(didAdd);
             }
         }
-        //@Override
+        @Override
         public boolean processCollEnd() {
             assertTrue((this.getLastCall() == BEGIN) || (this.getLastCall() == PROCESS));
             this.callList.add(END);

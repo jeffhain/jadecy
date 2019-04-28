@@ -81,7 +81,7 @@ public class DerivedTreeComputerPerf {
                 filter = NameFilters.equalsName(lastClassName);
             } else {
                 filter = new AbstractNameFilter() {
-                    //@Override
+                    @Override
                     public boolean accept(String name) {
                         return name.equals(lastClassName);
                     }

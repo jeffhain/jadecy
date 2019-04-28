@@ -34,21 +34,21 @@ public final class ParsingFilters {
     //--------------------------------------------------------------------------
     
     private static class MyAnyDirFilenameFilter implements FilenameFilter {
-        //@Override
+        @Override
         public boolean accept(File dir, String name) {
             return true;
         }
     }
     
     private static class MyAnyJarFilenameFilter implements FilenameFilter {
-        //@Override
+        @Override
         public boolean accept(File dir, String name) {
             return name.endsWith(".jar");
         }
     }
 
     private static class MyAnyClassFilenameFilter implements FilenameFilter {
-        //@Override
+        @Override
         public boolean accept(File dir, String name) {
             return name.endsWith(".class");
         }

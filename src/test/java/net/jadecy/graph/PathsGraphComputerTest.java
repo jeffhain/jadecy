@@ -69,13 +69,13 @@ public class PathsGraphComputerTest extends TestCase {
         public String toString() {
             return "[\nlist = " + this.list + ",\ncallList = " + this.callList + "]";
         }
-        //@Override
+        @Override
         public void processCollBegin() {
             assertTrue((this.callList.size() == 0) || (this.getLastCall() == END));
             this.callList.add(BEGIN);
             this.collPrev = null;
         }
-        //@Override
+        @Override
         public void processCollVertex(InterfaceVertex vertex) {
             assertTrue((this.getLastCall() == BEGIN) || (this.getLastCall() == PROCESS));
             this.callList.add(PROCESS);
@@ -91,7 +91,7 @@ public class PathsGraphComputerTest extends TestCase {
                 this.collPrev = vertex;
             }
         }
-        //@Override
+        @Override
         public boolean processCollEnd() {
             assertTrue(this.getLastCall() == PROCESS);
             this.callList.add(END);
@@ -113,14 +113,14 @@ public class PathsGraphComputerTest extends TestCase {
         public String toString() {
             return "[\npath = " + this.path + "]";
         }
-        //@Override
+        @Override
         public void processCollBegin() {
         }
-        //@Override
+        @Override
         public void processCollVertex(InterfaceVertex vertex) {
             this.path.add(vertex);
         }
-        //@Override
+        @Override
         public boolean processCollEnd() {
             return false;
         }

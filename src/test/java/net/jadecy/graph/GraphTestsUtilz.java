@@ -98,7 +98,7 @@ class GraphTestsUtilz {
              */
             return "[" + this.id + "]";
         }
-        //@Override
+        @Override
         public int compareTo(InterfaceVertex other) {
             final Vertex ozer = (Vertex) other;
             // Our ids are >= 0.
@@ -107,7 +107,7 @@ class GraphTestsUtilz {
         public int id() {
             return this.id;
         }
-        //@Override
+        @Override
         @SuppressWarnings("unchecked")
         public Set<Vertex> successors() {
             return (Set<Vertex>) this.successors;
@@ -164,11 +164,11 @@ class GraphTestsUtilz {
         public Set<Vertex> successors() {
             return (Set<Vertex>) super.successors();
         }
-        //@Override
+        @Override
         public Double weight() {
             return this.weight;
         }
-        //@Override
+        @Override
         @SuppressWarnings("unchecked")
         public Map<Wertex, Double> weightBySuccessor() {
             return this.weightBySuccessor;
@@ -251,7 +251,7 @@ class GraphTestsUtilz {
         public String toString() {
             return "[disconnected graphs, seed = " + this.seed + ", size = " + this.size + "]";
         }
-        //@Override
+        @Override
         public List<InterfaceVertex> newGraph() {
             final List<InterfaceVertex> graph = new ArrayList<InterfaceVertex>();
 
@@ -271,7 +271,7 @@ class GraphTestsUtilz {
 
             return graph;
         }
-        //@Override
+        @Override
         public TreeSet<ComparableVertexTreeSet> getExpectedSccs() {
             return this.expectedSccs;
         }
@@ -302,7 +302,7 @@ class GraphTestsUtilz {
         public String toString() {
             return "[chain graphs, seed = " + this.seed + ", size = " + this.size + "]";
         }
-        //@Override
+        @Override
         public List<InterfaceVertex> newGraph() {
             final List<InterfaceVertex> graph = new ArrayList<InterfaceVertex>();
 
@@ -328,7 +328,7 @@ class GraphTestsUtilz {
 
             return graph;
         }
-        //@Override
+        @Override
         public TreeSet<ComparableVertexTreeSet> getExpectedSccs() {
             return this.expectedSccs;
         }
@@ -392,7 +392,7 @@ class GraphTestsUtilz {
         public String toString() {
             return "[tree graph, seed = " + this.seed + ", depth = " + this.depth + ", size = " + this.size + "]";
         }
-        //@Override
+        @Override
         public List<InterfaceVertex> newGraph() {
             final List<InterfaceVertex> graph = new ArrayList<InterfaceVertex>();
 
@@ -423,7 +423,7 @@ class GraphTestsUtilz {
 
             return graph;
         }
-        //@Override
+        @Override
         public TreeSet<ComparableVertexTreeSet> getExpectedSccs() {
             return this.expectedSccs;
         }
@@ -453,7 +453,7 @@ class GraphTestsUtilz {
         public String toString() {
             return "[cycle graphs, seed = " + this.seed + ", size = " + this.size + "]";
         }
-        //@Override
+        @Override
         public List<InterfaceVertex> newGraph() {
             final List<InterfaceVertex> graph = new ArrayList<InterfaceVertex>();
 
@@ -486,7 +486,7 @@ class GraphTestsUtilz {
 
             return graph;
         }
-        //@Override
+        @Override
         public TreeSet<ComparableVertexTreeSet> getExpectedSccs() {
             return this.expectedSccs;
         }
@@ -515,7 +515,7 @@ class GraphTestsUtilz {
         public String toString() {
             return "[rake cycle graphs, seed = " + this.seed + ", size = " + this.size + "]";
         }
-        //@Override
+        @Override
         public List<InterfaceVertex> newGraph() {
             final List<InterfaceVertex> graph = new ArrayList<InterfaceVertex>();
 
@@ -550,7 +550,7 @@ class GraphTestsUtilz {
 
             return graph;
         }
-        //@Override
+        @Override
         public TreeSet<ComparableVertexTreeSet> getExpectedSccs() {
             return this.expectedSccs;
         }
@@ -580,7 +580,7 @@ class GraphTestsUtilz {
         public String toString() {
             return "[ball graphs, seed = " + this.seed + ", size = " + this.size + "]";
         }
-        //@Override
+        @Override
         public List<InterfaceVertex> newGraph() {
             final List<InterfaceVertex> graph = new ArrayList<InterfaceVertex>();
 
@@ -605,7 +605,7 @@ class GraphTestsUtilz {
 
             return graph;
         }
-        //@Override
+        @Override
         public TreeSet<ComparableVertexTreeSet> getExpectedSccs() {
             return this.expectedSccs;
         }
@@ -633,7 +633,7 @@ class GraphTestsUtilz {
         /**
          * @throws UnsupportedOperationException
          */
-        //@Override
+        @Override
         public TreeSet<ComparableVertexTreeSet> getExpectedSccs() {
             throw new UnsupportedOperationException();
         }
@@ -641,7 +641,7 @@ class GraphTestsUtilz {
         public String toString() {
             return "[random graphs, seed = " + this.seed + ", maxSize = " + this.maxSize + "]";
         }
-        //@Override
+        @Override
         public List<InterfaceVertex> newGraph() {
             final List<InterfaceVertex> graph = new ArrayList<InterfaceVertex>();
 
@@ -720,7 +720,7 @@ class GraphTestsUtilz {
          * 
          * @return Set of expected SCCs, updated on each generation.
          */
-        //@Override
+        @Override
         public TreeSet<ComparableVertexTreeSet> getExpectedSccs() {
             return this.expectedSccs;
         }
@@ -728,7 +728,7 @@ class GraphTestsUtilz {
         public String toString() {
             return "[random graphs, seed = " + this.seed + ", nbrOfSccs = " + this.nbrOfSccs + ", maxSccSize = " + this.maxSccSize + "]";
         }
-        //@Override
+        @Override
         public List<InterfaceVertex> newGraph() {
             final List<InterfaceVertex> graph = new ArrayList<InterfaceVertex>();
 

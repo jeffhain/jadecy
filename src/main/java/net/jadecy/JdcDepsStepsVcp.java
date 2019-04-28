@@ -52,12 +52,12 @@ class JdcDepsStepsVcp implements  InterfaceVertexCollProcessor {
         this.maxSteps = maxSteps;
     }
     
-    //@Override
+    @Override
     public void processCollBegin() {
         this.byteSizeByDependencyList.add(new TreeMap<String,Long>());
     }
     
-    //@Override
+    @Override
     public void processCollVertex(InterfaceVertex vertex) {
         final AbstractCodeData vertexD = (AbstractCodeData) vertex;
         
@@ -72,7 +72,7 @@ class JdcDepsStepsVcp implements  InterfaceVertexCollProcessor {
         }
     }
     
-    //@Override
+    @Override
     public boolean processCollEnd() {
         final int currentStepId = this.stepId++;
         return (this.maxSteps >= 0) && (currentStepId == this.maxSteps);

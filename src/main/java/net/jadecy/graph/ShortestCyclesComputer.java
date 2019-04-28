@@ -156,15 +156,15 @@ public class ShortestCyclesComputer {
             this.maxSize = maxSize;
             this.processor = processor;
         }
-        //@Override
+        @Override
         public void processCollBegin() {
             this.tmpScc.clear();
         }
-        //@Override
+        @Override
         public void processCollVertex(InterfaceVertex vertex) {
             this.tmpScc.add(vertex);
         }
-        //@Override
+        @Override
         public boolean processCollEnd() {
             return computeShortestCycles_onScc(
                     this.tmpScc,
@@ -178,7 +178,7 @@ public class ShortestCyclesComputer {
      * to help computing fewer cycles.
      */
     private static class MyWorkVertexComparator implements Comparator<WorkVertex> {
-        //@Override
+        @Override
         public int compare(WorkVertex v1, WorkVertex v2) {
             final int n1 = v1.successors().size();
             final int n2 = v2.successors().size();

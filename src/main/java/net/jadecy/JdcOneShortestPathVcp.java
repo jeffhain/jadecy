@@ -56,16 +56,16 @@ class JdcOneShortestPathVcp implements InterfaceVertexCollProcessor {
         this.depCausesByNameList = depCausesByNameList;
     }
     
-    //@Override
+    @Override
     public void processCollBegin() {
     }
     
-    //@Override
+    @Override
     public void processCollVertex(InterfaceVertex vertex) {
         this.tmpVertexList.add(vertex);
     }
     
-    //@Override
+    @Override
     public boolean processCollEnd() {
         
         final int dataCount = this.tmpVertexList.size();

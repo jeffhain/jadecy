@@ -40,7 +40,7 @@ public interface InterfaceWertex extends InterfaceVertex {
      * For example, successors() could be a view on weightBySuccessor() key set
      * (in which case successors() might not be modifiable through its API).
      */
-    //@Override
+    @Override
     public <V extends InterfaceVertex> Collection<V> successors();
     
     /**

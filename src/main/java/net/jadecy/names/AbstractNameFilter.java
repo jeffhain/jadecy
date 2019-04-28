@@ -21,7 +21,7 @@ package net.jadecy.names;
  */
 public abstract class AbstractNameFilter implements InterfaceNameFilter {
 
-    //@Override
+    @Override
     public String getPrefix() {
         return "";
     }

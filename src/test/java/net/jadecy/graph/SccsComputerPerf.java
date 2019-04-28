@@ -49,13 +49,13 @@ public class SccsComputerPerf {
     
     private static class MySccVcp implements InterfaceVertexCollProcessor {
         int counter;
-        //@Override
+        @Override
         public void processCollBegin() {
         }
-        //@Override
+        @Override
         public void processCollVertex(InterfaceVertex vertex) {
         }
-        //@Override
+        @Override
         public boolean processCollEnd() {
             this.counter++;
             return false;

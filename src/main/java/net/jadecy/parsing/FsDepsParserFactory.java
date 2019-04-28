@@ -30,7 +30,7 @@ public class FsDepsParserFactory implements InterfaceDepsParserFactory {
     // PUBLIC METHODS
     //--------------------------------------------------------------------------
     
-    //@Override
+    @Override
     public InterfaceDepsParser newInstance(
             boolean mustMergeNestedClasses,
             boolean apiOnly) {

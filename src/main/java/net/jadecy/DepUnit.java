@@ -85,7 +85,7 @@ public class DepUnit {
         public MyCycleProcessor(MyElemTypeData data) {
             this.data = data;
         }
-        //@Override
+        @Override
         public boolean processCycle(String[] names, String[][] causesArr) {
             
             final ArrayList<String> normalizedCycleAsList = new ArrayList<String>(names.length);

@@ -54,17 +54,17 @@ class JdcSccVcp implements InterfaceVertexCollProcessor {
         this.sccList = sccList;
     }
     
-    //@Override
+    @Override
     public void processCollBegin() {
         this.tmpSccDataList.clear();
     }
     
-    //@Override
+    @Override
     public void processCollVertex(InterfaceVertex vertex) {
         this.tmpSccDataList.add(vertex);
     }
     
-    //@Override
+    @Override
     public boolean processCollEnd() {
         final ArrayList<InterfaceVertex> sccDataList = this.tmpSccDataList;
         if (sccDataList.size() == 1) {

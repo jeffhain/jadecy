@@ -54,15 +54,15 @@ public class CyclesComputerTest extends TestCase {
         int nbrOfCyclesUntilStop = -1;
         public MyCycleComputerVcp() {
         }
-        //@Override
+        @Override
         public void processCollBegin() {
             this.cycleList.add(new ArrayList<InterfaceVertex>());
         }
-        //@Override
+        @Override
         public void processCollVertex(InterfaceVertex vertex) {
             this.cycleList.get(this.cycleList.size()-1).add(vertex);
         }
-        //@Override
+        @Override
         public boolean processCollEnd() {
             if (this.nbrOfCyclesUntilStop < 0) {
                 return false;

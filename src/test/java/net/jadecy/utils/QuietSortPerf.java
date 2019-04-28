@@ -46,7 +46,7 @@ public class QuietSortPerf {
         public String toString() {
             return Arrays.class.getSimpleName();
         }
-        //@Override
+        @Override
         public void sort(Object[] a) {
             Arrays.sort(a, 0, a.length);
         }
@@ -57,7 +57,7 @@ public class QuietSortPerf {
         public String toString() {
             return QuietSort.class.getSimpleName();
         }
-        //@Override
+        @Override
         public void sort(Object[] a) {
             QuietSort.sort(a, 0, a.length);
         }

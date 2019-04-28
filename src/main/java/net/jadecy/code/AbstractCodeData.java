@@ -121,12 +121,12 @@ public abstract class AbstractCodeData implements InterfaceVertex {
         return NameUtils.toDisplayName(this.name);
     }
 
-    //@Override
+    @Override
     public int compareTo(InterfaceVertex other) {
         return this.name.compareTo(((AbstractCodeData) other).name);
     }
 
-    //@Override
+    @Override
     @SuppressWarnings("unchecked")
     public abstract Set<? extends AbstractCodeData> successors();
 

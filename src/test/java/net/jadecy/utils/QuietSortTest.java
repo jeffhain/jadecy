@@ -151,7 +151,7 @@ public class QuietSortTest extends TestCase {
 
         // For decreasing ordering.
         final Comparator<Integer> comparator = new Comparator<Integer>() {
-            //@Override
+            @Override
             public int compare(Integer i1, Integer i2) {
                 final int v1 = i1.intValue();
                 final int v2 = i2.intValue();

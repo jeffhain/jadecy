@@ -55,17 +55,17 @@ class JdcCycleVcp implements InterfaceVertexCollProcessor {
         this.processor = processor;
     }
     
-    //@Override
+    @Override
     public void processCollBegin() {
         this.tmpCycle.clear();
     }
     
-    //@Override
+    @Override
     public void processCollVertex(InterfaceVertex vertex) {
         this.tmpCycle.add((AbstractCodeData) vertex);
     }
     
-    //@Override
+    @Override
     public boolean processCollEnd() {
         final int cycleSize = this.tmpCycle.size();
         

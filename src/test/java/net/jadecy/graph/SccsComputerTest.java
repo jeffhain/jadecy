@@ -62,13 +62,13 @@ public class SccsComputerTest extends TestCase {
          */
         InterfaceVertex collPrev = null;
         int nbrOfSccsUntilStop = -1;
-        //@Override
+        @Override
         public void processCollBegin() {
             this.sccList.add(new ArrayList<InterfaceVertex>());
             this.currentScc = new ComparableVertexTreeSet();
             this.collPrev = null;
         }
-        //@Override
+        @Override
         public void processCollVertex(InterfaceVertex vertex) {
             this.sccList.get(this.sccList.size()-1).add(vertex);
             this.currentScc.add(vertex);
@@ -81,7 +81,7 @@ public class SccsComputerTest extends TestCase {
                 this.collPrev = vertex;
             }
         }
-        //@Override
+        @Override
         public boolean processCollEnd() {
             final boolean didAdd = this.sccSet.add(this.currentScc);
             if (!didAdd) {

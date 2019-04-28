@@ -39,7 +39,7 @@ public class NameFilters {
         public String toString() {
             return "not(" + this.filter + ")";
         }
-        //@Override
+        @Override
         public boolean accept(String name) {
             return !this.filter.accept(name);
         }
@@ -76,7 +76,7 @@ public class NameFilters {
         public String getPrefix() {
             return this.prefix;
         }
-        //@Override
+        @Override
         public boolean accept(String name) {
             if (this.isNoneFilterForSure) {
                 // Easy.
@@ -112,7 +112,7 @@ public class NameFilters {
         public String getPrefix() {
             return this.prefix;
         }
-        //@Override
+        @Override
         public boolean accept(String name) {
             for (InterfaceNameFilter filter : this.filters) {
                 if (filter.accept(name)) {
@@ -134,7 +134,7 @@ public class NameFilters {
         public String toString() {
             return "any";
         }
-        //@Override
+        @Override
         public boolean accept(String name) {
             return true;
         }
@@ -151,7 +151,7 @@ public class NameFilters {
         public String getPrefix() {
             return NONE_PREFIX;
         }
-        //@Override
+        @Override
         public boolean accept(String name) {
             return false;
         }
@@ -175,7 +175,7 @@ public class NameFilters {
         public String getPrefix() {
             return this.name;
         }
-        //@Override
+        @Override
         public boolean accept(String name) {
             return name.equals(this.name);
         }
@@ -195,7 +195,7 @@ public class NameFilters {
         public String getPrefix() {
             return this.prefix;
         }
-        //@Override
+        @Override
         public boolean accept(String name) {
             return name.startsWith(this.prefix);
         }
@@ -211,7 +211,7 @@ public class NameFilters {
         public String toString() {
             return "endsWith(" + this.suffix + ")";
         }
-        //@Override
+        @Override
         public boolean accept(String name) {
             return name.endsWith(this.suffix);
         }
@@ -227,7 +227,7 @@ public class NameFilters {
         public String toString() {
             return "contains(" + this.part + ")";
         }
-        //@Override
+        @Override
         public boolean accept(String name) {
             return name.contains(this.part);
         }
@@ -243,7 +243,7 @@ public class NameFilters {
         public String toString() {
             return "matches(" + this.regex + ")";
         }
-        //@Override
+        @Override
         public boolean accept(String name) {
             return name.matches(this.regex);
         }
@@ -268,7 +268,7 @@ public class NameFilters {
         public String getPrefix() {
             return this.beginName;
         }
-        //@Override
+        @Override
         public boolean accept(String name) {
             return NameUtils.startsWithName(name, this.beginName);
         }
@@ -288,7 +288,7 @@ public class NameFilters {
         public String getPrefix() {
             return "";
         }
-        //@Override
+        @Override
         public boolean accept(String name) {
             return NameUtils.endsWithName(name, this.endName);
         }
@@ -308,7 +308,7 @@ public class NameFilters {
         public String getPrefix() {
             return "";
         }
-        //@Override
+        @Override
         public boolean accept(String name) {
             return NameUtils.containsName(name, this.name);
         }

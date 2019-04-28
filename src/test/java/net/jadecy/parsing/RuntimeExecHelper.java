@@ -136,11 +136,11 @@ public class RuntimeExecHelper {
                 }
             }
         }
-        //@Override
+        @Override
         public boolean isDone() {
             return this.done;
         }
-        //@Override
+        @Override
         public void interruptRunner() {
             synchronized (this.runnerNullificationMutex) {
                 final Thread runner = this.runner;
@@ -173,29 +173,29 @@ public class RuntimeExecHelper {
             this.outReader = outReader;
             this.errReader = errReader;
         }
-        //@Override
+        @Override
         public Process getProcess() {
             return this.process;
         }
-        //@Override
+        @Override
         public InterfaceStreamReader getOutReader() {
             return this.outReader;
         }
-        //@Override
+        @Override
         public InterfaceStreamReader getErrReader() {
             return this.errReader;
         }
         /**
          * Shortcut for getProcess().waitFor().
          */
-        //@Override
+        @Override
         public int waitFor() throws InterruptedException {
             return this.process.waitFor();
         }
         /**
          * Shortcut for getProcess().exitValue().
          */
-        //@Override
+        @Override
         public int exitValue() {
             return this.process.exitValue();
         }

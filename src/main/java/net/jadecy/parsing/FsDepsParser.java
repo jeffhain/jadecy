@@ -77,22 +77,22 @@ public class FsDepsParser implements InterfaceDepsParser {
         this.apiOnly = apiOnly;
     }
 
-    //@Override
+    @Override
     public boolean getMustMergeNestedClasses() {
         return this.mustMergeNestedClasses;
     }
 
-    //@Override
+    @Override
     public boolean getApiOnly() {
         return this.apiOnly;
     }
 
-    //@Override
+    @Override
     public PackageData getDefaultPackageData() {
         return this.defaultPackageData;
     }
 
-    //@Override
+    @Override
     public boolean accumulateDependencies(
             File file,
             ParsingFilters filters) {

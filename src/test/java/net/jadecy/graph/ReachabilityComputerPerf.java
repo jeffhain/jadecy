@@ -53,15 +53,15 @@ public class ReachabilityComputerPerf {
         long vCount = 0;
         public MyProcessor() {
         }
-        //@Override
+        @Override
         public void processCollBegin() {
             this.cCount++;
         }
-        //@Override
+        @Override
         public void processCollVertex(InterfaceVertex vertex) {
             this.vCount++;
         }
-        //@Override
+        @Override
         public boolean processCollEnd() {
             return false;
         }

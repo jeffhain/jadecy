@@ -58,15 +58,15 @@ public class MemPrintStream extends PrintStream {
         public MyCharSeq(char[] array) {
             this.array = array;
         }
-        //@Override
+        @Override
         public CharSequence subSequence(int start, int end) {
             throw new UnsupportedOperationException();
         }
-        //@Override
+        @Override
         public int length() {
             return this.array.length;
         }
-        //@Override
+        @Override
         public char charAt(int index) {
             return this.array[index];
         }

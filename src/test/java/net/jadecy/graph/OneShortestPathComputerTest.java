@@ -63,12 +63,12 @@ public class OneShortestPathComputerTest extends TestCase {
         public String toString() {
             return "[\nlist = " + this.list + ",\nset = " + this.set + ",\ncallList = " + this.callList + "]";
         }
-        //@Override
+        @Override
         public void processCollBegin() {
             assertTrue((this.callList.size() == 0) || (this.getLastCall() == END));
             this.callList.add(BEGIN);
         }
-        //@Override
+        @Override
         public void processCollVertex(InterfaceVertex vertex) {
             assertTrue((this.getLastCall() == BEGIN) || (this.getLastCall() == PROCESS));
             this.callList.add(PROCESS);
@@ -86,7 +86,7 @@ public class OneShortestPathComputerTest extends TestCase {
                 assertTrue(didAdd);
             }
         }
-        //@Override
+        @Override
         public boolean processCollEnd() {
             assertTrue(this.getLastCall() == PROCESS);
             this.callList.add(END);

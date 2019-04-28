@@ -43,7 +43,7 @@ class JdcmCycleProcessor implements InterfaceCycleProcessor {
             this.name = name;
             this.count = count;
         }
-        //@Override
+        @Override
         public int compareTo(MyEntry other) {
             if (other == this) {
                 return 0;
@@ -130,7 +130,7 @@ class JdcmCycleProcessor implements InterfaceCycleProcessor {
         return this.count;
     }
 
-    //@Override
+    @Override
     public boolean processCycle(
             String[] names,
             String[][] causesArr) {

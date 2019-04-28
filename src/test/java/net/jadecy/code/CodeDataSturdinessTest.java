@@ -289,7 +289,7 @@ public class CodeDataSturdinessTest extends TestCase {
                 testData,
                 oldSubtreeModCountByPackageName,
                 new AbstractNameFilter() {
-                    //@Override
+                    @Override
                     public boolean accept(String name) {
                         return (!didExist) && NameUtils.startsWithName(parent.name(), name);
                     }
@@ -365,7 +365,7 @@ public class CodeDataSturdinessTest extends TestCase {
                 testData,
                 oldSubtreeModCountByPackageName,
                 new AbstractNameFilter() {
-                    //@Override
+                    @Override
                     public boolean accept(String name) {
                         return (!didExist) && NameUtils.startsWithName(parent.name(), name);
                     }
@@ -430,7 +430,7 @@ public class CodeDataSturdinessTest extends TestCase {
                 testData,
                 oldSubtreeModCountByPackageName,
                 new AbstractNameFilter() {
-                    //@Override
+                    @Override
                     public boolean accept(String name) {
                         for (PackageData packageData : packagesToModify) {
                             if (NameUtils.startsWithName(packageData.name(), name)) {
@@ -513,7 +513,7 @@ public class CodeDataSturdinessTest extends TestCase {
                     testData,
                     oldSubtreeModCountByPackageName,
                     new AbstractNameFilter() {
-                        //@Override
+                        @Override
                         public boolean accept(String name) {
                             for (PackageData packageData : expectedPackagesDeletedOrModified) {
                                 if (NameUtils.startsWithName(packageData.name(), name)) {
@@ -610,7 +610,7 @@ public class CodeDataSturdinessTest extends TestCase {
                 testData,
                 oldSubtreeModCountByPackageName,
                 new AbstractNameFilter() {
-                    //@Override
+                    @Override
                     public boolean accept(String name) {
                         return expectedDidMod
                                 && (NameUtils.startsWithName(p1.name(), name)
@@ -682,7 +682,7 @@ public class CodeDataSturdinessTest extends TestCase {
                 testData,
                 oldSubtreeModCountByPackageName,
                 new AbstractNameFilter() {
-                    //@Override
+                    @Override
                     public boolean accept(String name) {
                         return didExist
                                 && (NameUtils.startsWithName(p1.name(), name)
@@ -764,7 +764,7 @@ public class CodeDataSturdinessTest extends TestCase {
                 testData,
                 oldSubtreeModCountByPackageName,
                 new AbstractNameFilter() {
-                    //@Override
+                    @Override
                     public boolean accept(String name) {
                         return (oldByteSize == null)
                                 && NameUtils.startsWithName(topLevelClassData.parent().name(), name);
@@ -866,7 +866,7 @@ public class CodeDataSturdinessTest extends TestCase {
                 testData,
                 oldSubtreeModCountByPackageName,
                 new AbstractNameFilter() {
-                    //@Override
+                    @Override
                     public boolean accept(String name) {
                         for (PackageData packageData : expectedPackagesDeletedOrModified) {
                             if (NameUtils.startsWithName(packageData.name(), name)) {

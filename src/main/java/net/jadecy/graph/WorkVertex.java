@@ -71,7 +71,7 @@ class WorkVertex implements InterfaceVertex {
         return "(id=" + this.id + ")" + this.backingVertex;
     }
     
-    //@Override
+    @Override
     public int compareTo(InterfaceVertex other) {
         final WorkVertex ozer = (WorkVertex) other;
         // Our ids are >= 0.
@@ -92,7 +92,7 @@ class WorkVertex implements InterfaceVertex {
         return this.id;
     }
     
-    //@Override
+    @Override
     @SuppressWarnings("unchecked")
     public TreeSet<WorkVertex> successors() {
         return this.successors;

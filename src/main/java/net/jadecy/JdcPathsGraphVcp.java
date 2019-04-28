@@ -52,16 +52,16 @@ class JdcPathsGraphVcp implements InterfaceVertexCollProcessor {
         this.causesByDepByName = causesByDepByName;
     }
     
-    //@Override
+    @Override
     public void processCollBegin() {
     }
     
-    //@Override
+    @Override
     public void processCollVertex(InterfaceVertex vertex) {
         this.tmpVertexSet.add(vertex);
     }
     
-    //@Override
+    @Override
     public boolean processCollEnd() {
         for (InterfaceVertex vertex : this.tmpVertexSet) {
             JdcVcpUtils.addCausesByDepForVertex(

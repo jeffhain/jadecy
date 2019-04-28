@@ -131,7 +131,7 @@ public abstract class AbstractVirtualCodeGraphTezt extends TestCase {
     //--------------------------------------------------------------------------
     
     private class MyDepsParserFactory implements InterfaceDepsParserFactory {
-        //@Override
+        @Override
         public InterfaceDepsParser newInstance(
                 boolean mustMergeNestedClasses,
                 boolean apiOnly) {
@@ -154,19 +154,19 @@ public abstract class AbstractVirtualCodeGraphTezt extends TestCase {
             this.mustMergeNestedClasses = mustMergeNestedClasses;
             this.apiOnly = apiOnly;
         }
-        //@Override
+        @Override
         public boolean getMustMergeNestedClasses() {
             return this.mustMergeNestedClasses;
         }
-        //@Override
+        @Override
         public boolean getApiOnly() {
             return this.apiOnly;
         }
-        //@Override
+        @Override
         public PackageData getDefaultPackageData() {
             return this.defaultP;
         }
-        //@Override
+        @Override
         public boolean accumulateDependencies(
                 File file,
                 ParsingFilters filters) {

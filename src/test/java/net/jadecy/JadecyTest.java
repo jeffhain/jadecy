@@ -114,7 +114,7 @@ public class JadecyTest extends AbstractVirtualCodeGraphTezt {
     private static class MyCycleProcessor implements InterfaceCycleProcessor {
         int counter = 0;
         final List<MyProcessed> processedList = new ArrayList<JadecyTest.MyProcessed>();
-        //@Override
+        @Override
         public boolean processCycle(String[] names, String[][] causesArr) {
             if (DEBUG) {
                 System.out.println();

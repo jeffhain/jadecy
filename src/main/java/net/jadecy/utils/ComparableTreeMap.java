@@ -52,7 +52,7 @@ public class ComparableTreeMap<K extends Comparable<K>,V> extends TreeMap<K,V> i
         super(m);
     }
     
-    //@Override
+    @Override
     public int compareTo(ComparableTreeMap<K,V> other) {
         final int aSize = this.size();
         final int bSize = other.size();

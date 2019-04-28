@@ -46,7 +46,7 @@ public class ComparableArrayList<T extends Comparable<T>> extends ArrayList<T> i
         super(c);
     }
     
-    //@Override
+    @Override
     public int compareTo(ComparableArrayList<T> other) {
         final int aSize = this.size();
         final int bSize = other.size();

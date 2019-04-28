@@ -61,12 +61,12 @@ class JdcDepsGraphVcp implements InterfaceVertexCollProcessor {
         this.maxSteps = maxSteps;
     }
     
-    //@Override
+    @Override
     public void processCollBegin() {
         this.currentCausesByDepByName = new TreeMap<String,SortedMap<String,SortedSet<String>>>();
     }
     
-    //@Override
+    @Override
     public void processCollVertex(InterfaceVertex vertex) {
         JdcVcpUtils.addCausesByDepForVertex(
                 this.elemType,
@@ -75,7 +75,7 @@ class JdcDepsGraphVcp implements InterfaceVertexCollProcessor {
                 this.currentCausesByDepByName);
     }
     
-    //@Override
+    @Override
     public boolean processCollEnd() {
         this.causesByDepByNameList.add(this.currentCausesByDepByName);
         final int currentStepId = this.stepId++;

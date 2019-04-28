@@ -147,7 +147,7 @@ public class FsDepsParserTest extends TestCase {
         ParsingFilters filters = ParsingFilters.defaultInstance();
 
         filters = filters.withClassFilenameFilter(new FilenameFilter() {
-            //@Override
+            @Override
             public boolean accept(File dir, String name) {
                 return false;
             }
@@ -161,7 +161,7 @@ public class FsDepsParserTest extends TestCase {
         ParsingFilters filters = ParsingFilters.defaultInstance();
 
         filters = filters.withJarFilenameFilter(new FilenameFilter() {
-            //@Override
+            @Override
             public boolean accept(File dir, String name) {
                 return false;
             }
@@ -175,7 +175,7 @@ public class FsDepsParserTest extends TestCase {
         ParsingFilters filters = ParsingFilters.defaultInstance();
 
         filters = filters.withDirFilenameFilter(new FilenameFilter() {
-            //@Override
+            @Override
             public boolean accept(File dir, String name) {
                 return false;
             }

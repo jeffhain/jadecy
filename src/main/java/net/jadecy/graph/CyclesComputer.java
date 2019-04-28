@@ -88,15 +88,15 @@ public class CyclesComputer {
         public void clearAddedSccList() {
             this.addedSccList.clear();
         }
-        //@Override
+        @Override
         public void processCollBegin() {
             this.scc = new MyComparableScc();
         }
-        //@Override
+        @Override
         public void processCollVertex(InterfaceVertex vertex) {
             this.scc.add((WorkVertex) vertex);
         }
-        //@Override
+        @Override
         public boolean processCollEnd() {
             final MyComparableScc scc = this.scc;
             this.scc = null;
@@ -127,7 +127,7 @@ public class CyclesComputer {
         private static final long serialVersionUID = 1L;
         public MyComparableScc() {
         }
-        //@Override
+        @Override
         public int compareTo(MyComparableScc other) {
             final int size1 = this.size();
             final int size2 = other.size();
