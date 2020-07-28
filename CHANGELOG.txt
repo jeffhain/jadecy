@@ -1,6 +1,9 @@
 ################################################################################
 Jadecy X.X, XXXX/XX/XX
 
+- Corrected an issue in JavacHelper, which was always using ';' as
+  classpath separator, instead of ':' by default and ';' only on Windows.
+
 - Upgraded javadoc and tests for byte size computations.
 
 ################################################################################

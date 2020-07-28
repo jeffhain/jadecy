@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 Jeff Hain
+ * Copyright 2015-2020 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,6 +62,22 @@ public class JavacHelper {
      */
     private static final String CHARSET_NAME = "UTF-8";
     private static final Charset CHARSET = Charset.forName(CHARSET_NAME);
+    
+    /**
+     * Separator for classpath entries.
+     */
+    private static final String CP_SEP;
+    static {
+        final String osName = System.getProperty("os.name");
+        final boolean isWindows =
+                (osName != null)
+                && osName.startsWith("Windows");
+        /*
+         * Like its command line flavor,
+         * JavaCompiler is not fully platform-agnostic.
+         */
+        CP_SEP = (isWindows ? ";" : ":");
+    }
 
     private final List<String> optionList;
     
@@ -213,7 +229,7 @@ public class JavacHelper {
                 sb.append(compDirPath);
                 
                 for (String classpathElement : this.classpathElementList) {
-                    sb.append(";");
+                    sb.append(CP_SEP);
                     sb.append(classpathElement);
                 }
                 
