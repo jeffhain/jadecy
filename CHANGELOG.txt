@@ -1,5 +1,5 @@
 ################################################################################
-Jadecy X.X, XXXX/XX/XX
+Jadecy 2.0.1, 2020/07/28
 
 - Corrected an issue in JavacHelper, which was always using ';' as
   classpath separator, instead of ':' by default and ';' only on Windows.

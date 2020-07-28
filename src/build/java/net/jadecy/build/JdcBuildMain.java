@@ -32,7 +32,7 @@ public class JdcBuildMain {
     // CONFIGURATION
     //--------------------------------------------------------------------------
     
-    private static final String JAR_VERSION = "2.0";
+    private static final String JAR_VERSION = "2.0.1";
     private static final String JAR_FILE_NAME = "jadecy.jar";
     
     private static final String SOURCE_VERSION = "1.5";
