@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016 Jeff Hain
+ * Copyright 2015-2020 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -136,7 +136,8 @@ public class Jadecy {
      * and retaining all parser classes.
      * 
      * @param mustMergeNestedClasses True if must merge dependencies from and to
-     *        nested classes into their top level classes, false otherwise.
+     *        nested classes into their top level classes, along with byte size,
+     *        false otherwise.
      * @param apiOnly If true, only takes into account API dependencies
      *        (cf. ClassDepsParser for details).
      */

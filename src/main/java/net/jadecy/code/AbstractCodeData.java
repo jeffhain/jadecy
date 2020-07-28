@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2020 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,11 +71,10 @@ public abstract class AbstractCodeData implements InterfaceVertex {
     private final String name;
     
     /**
-     * Size in bytes of corresponding byte code, i.e. either of the class file,
-     * or nested plus top level class files if merging them, or of the class
-     * files contained in the package.
-     * Can be 0 if corresponding class file(s) could not be parsed or have not
-     * been parsed yet.
+     * For a class data, the byte size of the corresponding class file
+     * (or merged class files), or 0 if has not been parsed yet.
+     * For a package data, the sum of byte sizes of parsed classes
+     * belonging to the corresponding package.
      */
     private long byteSize = 0;
 
@@ -189,9 +188,10 @@ public abstract class AbstractCodeData implements InterfaceVertex {
     }
     
     /**
-     * @return For a class data, the byte size of the corresponding class file,
-     *         or 0 if has not been parsed. For a package data, the sum of byte
-     *         sizes of parsed classes belonging to the corresponding package.
+     * @return For a class data, the byte size of the corresponding class file
+     *         (or merged class files), or 0 if has not been parsed yet.
+     *         For a package data, the sum of byte sizes of parsed classes
+     *         belonging to the corresponding package.
      */
     public long byteSize() {
         return this.byteSize;

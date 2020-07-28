@@ -1,4 +1,9 @@
 ################################################################################
+Jadecy X.X, XXXX/XX/XX
+
+- Upgraded javadoc and tests for byte size computations.
+
+################################################################################
 Jadecy 2.0, 2019/04/28
 
 - Corrected bug in DepUnit, where checkDeps(...) method would ignore

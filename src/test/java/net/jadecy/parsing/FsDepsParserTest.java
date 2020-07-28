@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 Jeff Hain
+ * Copyright 2015-2020 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -182,6 +182,81 @@ public class FsDepsParserTest extends TestCase {
         });
 
         checkThrowsIAEFileNotFound(parser, NON_EXISTING_DIR, filters);
+    }
+    
+    /*
+     * 
+     */
+
+    public void test_accumulateDependencies_classByteSizes() {
+        final boolean apiOnly = false;
+        for (boolean mustMergeNestedClasses : FALSE_TRUE) {
+            if (DEBUG) {
+                System.out.println();
+                System.out.println("mustMergeNestedClasses = " + mustMergeNestedClasses);
+            }
+
+            final FsDepsParser parser = new FsDepsParser(
+                    mustMergeNestedClasses,
+                    apiOnly);
+            final PackageData defaultP = parser.getDefaultPackageData();
+            final ParsingFilters filters = ParsingFilters.defaultInstance();
+
+            parser.accumulateDependencies(
+                    PACKAGE_TEST2_FILE,
+                    filters);
+
+            final PackageData p = defaultP.getPackageData(PACKAGE_TEST2_NAME);
+
+            if (DEBUG) {
+                defaultP.printSubtree();
+            }
+
+            final ClassData b = p.getClassData("B");
+            final ClassData c = p.getClassData("B$C");
+            if (DEBUG) {
+                System.out.println("b.byteSize() = " + b.byteSize());
+                System.out.println(
+                        "b.byteSizeByClassFileNameNoExt().size() = "
+                                + b.byteSizeByClassFileNameNoExt().size());
+                System.out.println(
+                        "b.byteSizeByClassFileNameNoExt().get(\"B\") = "
+                                + b.byteSizeByClassFileNameNoExt().get("B"));
+                System.out.println(
+                        "b.byteSizeByClassFileNameNoExt().get(\"B$C\") = "
+                                + b.byteSizeByClassFileNameNoExt().get("B$C"));
+                //
+                if (c != null) {
+                    System.out.println("c.byteSize() = " + c.byteSize());
+                    System.out.println(
+                            "c.byteSizeByClassFileNameNoExt().size() = "
+                                    + c.byteSizeByClassFileNameNoExt().size());
+                    System.out.println(
+                            "c.byteSizeByClassFileNameNoExt().get(\"B$C\") = "
+                                    + c.byteSizeByClassFileNameNoExt().get("B$C"));
+                }
+            }
+            if (mustMergeNestedClasses) {
+                assertEquals(2, b.byteSizeByClassFileNameNoExt().size());
+                final Long bs = b.byteSizeByClassFileNameNoExt().get("B");
+                final Long cs = b.byteSizeByClassFileNameNoExt().get("B$C");
+                assertNotNull(bs);
+                assertNotNull(cs);
+                //
+                assertEquals(bs.longValue() + cs.longValue(), b.byteSize());
+                assertNull(c);
+            } else {
+                assertEquals(1, b.byteSizeByClassFileNameNoExt().size());
+                assertEquals(1, c.byteSizeByClassFileNameNoExt().size());
+                final Long bs = b.byteSizeByClassFileNameNoExt().get("B");
+                final Long cs = c.byteSizeByClassFileNameNoExt().get("B$C");
+                assertNotNull(bs);
+                assertNotNull(cs);
+                //
+                assertEquals(bs.longValue(), b.byteSize());
+                assertEquals(cs.longValue(), c.byteSize());
+            }
+        }
     }
     
     /*

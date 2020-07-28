@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Jeff Hain
+ * Copyright 2016-2020 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ public class ShortestCyclesComputer {
      * 
      * - Can make things much faster (lower practical algorithmic complexity),
      *   for example in case of a long cycle, at the cost (positive or negative)
-     *   of eventually causing some cycles to be screened our by multiple larger
+     *   of eventually causing some cycles to be screened out by multiple larger
      *   cycles already covering all their edges (depending on the order in
      *   which vertices are iterated on):
      *   For each vertex of main loop, not pushing the BFS until reaching all
