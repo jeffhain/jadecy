@@ -68,9 +68,10 @@ public class ClassDepsParserTest extends TestCase {
     private static final String JDEPS = JAVA_HOME + "/bin/jdeps";
     
     /**
-     * TODO cf. https://bugs.openjdk.java.net/browse/JDK-8136419.
+     * Cf. https://bugs.openjdk.java.net/browse/JDK-8136419.
+     * Fixed in JDK 9.
      */
-    private static final boolean BUG_JDK_8136419_FIXED = false;
+    private static final boolean BUG_JDK_8136419_FIXED = (getJavaVersion() >= 9);
     
     private static final boolean HANDLE_WEIRD_DOLLAR_SIGN_USAGES = true;
 
@@ -296,12 +297,14 @@ public class ClassDepsParserTest extends TestCase {
     @TestAnno1
     public static class MyClassNonGenSig_public extends RuntimeException implements Runnable {
         private static final long serialVersionUID = 1L;
+        @Override
         public void run() {
         }
     }
     @TestAnno1
     private static class MyClassNonGenSig_private extends RuntimeException implements Runnable {
         private static final long serialVersionUID = 1L;
+        @Override
         public void run() {
         }
     }
@@ -1400,6 +1403,7 @@ public class ClassDepsParserTest extends TestCase {
         public Object foo() {
             // $1
             return new Runnable() {
+                @Override
                 public void run() {
                 }
             };
@@ -2044,6 +2048,7 @@ public class ClassDepsParserTest extends TestCase {
         public Integer foo() {
             return null;
         }
+        @Override
         @TestAnno1
         public void run() {
             @TestAnno1
@@ -2060,6 +2065,7 @@ public class ClassDepsParserTest extends TestCase {
         public Integer foo() {
             return null;
         }
+        @Override
         @TestAnno1
         public void run() {
             @TestAnno1
@@ -2746,5 +2752,21 @@ public class ClassDepsParserTest extends TestCase {
                 System.out.println("exceeding : (" + exceeding.size() + ") " + exceeding);
             }
         }
+    }
+    
+    /**
+     * @return 8 for 1.8.x.y, 9 for 9.x.y, etc.
+     */
+    private static int getJavaVersion() {
+        String verStr = System.getProperty("java.version");
+        if (verStr.startsWith("1.")) {
+            verStr = verStr.substring(2);
+        }
+        final int di = verStr.indexOf(".");
+        if (di > 0) {
+            verStr = verStr.substring(0, di);
+        }
+        final int ver = Integer.parseInt(verStr);
+        return ver;
     }
 }
