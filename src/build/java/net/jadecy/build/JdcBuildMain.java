@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Jeff Hain
+ * Copyright 2017-2023 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ public class JdcBuildMain {
     // CONFIGURATION
     //--------------------------------------------------------------------------
     
-    private static final String JAR_VERSION = "2.0.1";
+    private static final String JAR_VERSION = "2.1.0";
     private static final String JAR_FILE_NAME = "jadecy.jar";
     
     private static final String SOURCE_VERSION = "1.5";

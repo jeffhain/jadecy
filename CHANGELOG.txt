@@ -1,4 +1,18 @@
 ################################################################################
+Jadecy 2.1.0, 2023/04/10
+
+- Upgraded supported class file format from 52 (Java 8) to 64 (Java 20)
+  (previous version would throw when stumbling upon new constant pool flags,
+  such as Java 9's module).
+  Can now parse class dependencies from modules (just the module main class,
+  not dependencies between modules),
+  and dependencies from records (for which we parse the new record attribute,
+  although it seems that proper record dependencies could already be computed
+  from previously parsed structures).
+  PermittedSubclasses are not considered a dependency
+  (that would cause cycles in good code).
+
+################################################################################
 Jadecy 2.0.1, 2020/07/28
 
 - Corrected an issue in JavacHelper, which was always using ';' as

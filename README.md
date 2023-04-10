@@ -19,7 +19,7 @@ Apache License V2.0
     and thus requires Java 6+
 
 - src/test:
-  - Java 8+
+  - Java 16+ (for records)
   - JUnit 3.8.1 (under lib/junit.jar)
 
 # Principal classes
@@ -35,9 +35,8 @@ Apache License V2.0
 
 # Miscellaneous
 
-- Handles class files of major version <= 52 (Java 8), and does best effort
+- Handles class files of major version <= 64 (Java 20), and does best effort
   if major version is higher.
-  Could compute dependencies out of JDK 9 ea build 95 class files.
 
 - Cannot parse .jimage files, which would require dependency to jrt-fs.jar,
   which itself requires Java 8, and is not trivial to use
