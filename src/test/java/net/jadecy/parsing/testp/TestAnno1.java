@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeff Hain
+ * Copyright 2015-2023 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,30 @@
  */
 package net.jadecy.parsing.testp;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 /**
- * Simple annotation, to check whether dependencies to annotations are detected.
+ * Kept at runtime, target anywhere.
  */
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target({
+    ElementType.TYPE,
+    ElementType.FIELD,
+    ElementType.METHOD,
+    ElementType.PARAMETER,
+    ElementType.CONSTRUCTOR,
+    ElementType.LOCAL_VARIABLE,
+    ElementType.ANNOTATION_TYPE,
+    ElementType.PACKAGE,
+    ElementType.TYPE_PARAMETER,
+    ElementType.TYPE_USE,
+    ElementType.MODULE,
+    ElementType.RECORD_COMPONENT
+})
 public @interface TestAnno1 {
 }

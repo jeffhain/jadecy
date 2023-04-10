@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 Jeff Hain
+ * Copyright 2015-2023 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,29 @@
 package net.jadecy.parsing;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.TypeDescriptor;
+import java.lang.runtime.ObjectMethods;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import junit.framework.TestCase;
 import net.jadecy.comp.JdcFsUtils;
@@ -40,8 +49,15 @@ import net.jadecy.parsing.test$.A$;
 import net.jadecy.parsing.test$.A$$B;
 import net.jadecy.parsing.testp.TestAnno1;
 import net.jadecy.parsing.testp.TestAnno2;
+import net.jadecy.parsing.testp.TestAnno3;
+import net.jadecy.parsing.testp.TestAnno4;
+import net.jadecy.parsing.testp.TestAnno5;
+import net.jadecy.parsing.testp.TestAnnoComplex1;
+import net.jadecy.parsing.testr.RecordSimple;
+import net.jadecy.parsing.testr.RecordComplex;
 import net.jadecy.tests.JdcTestCompHelper;
 import net.jadecy.tests.JdcTestConfig;
+import net.jadecy.tests.JdcTestUtils;
 
 public class ClassDepsParserTest extends TestCase {
 
@@ -57,23 +73,22 @@ public class ClassDepsParserTest extends TestCase {
                             JdcTestCompHelper.MAIN_SRC_PATH,
                             JdcTestCompHelper.TEST_SRC_PATH));
 
-    private static final boolean COMPARE_WITH_JDEPS = false;
+    private static final boolean MUST_COMPARE_WITH_JDEPS = false;
 
-    private static final String JAVA_HOME = JdcTestConfig.getJdk8Home();
-    
     /**
      * We don't necessarily want to compute same dependencies than jdeps,
      * but jdeps output can give hints.
      */
-    private static final String JDEPS = JAVA_HOME + "/bin/jdeps";
+    private static final String JDEPS = JdcTestConfig.getJdkHome() + "/bin/jdeps";
     
     /**
      * Cf. https://bugs.openjdk.java.net/browse/JDK-8136419.
      * Fixed in JDK 9.
      */
-    private static final boolean BUG_JDK_8136419_FIXED = (getJavaVersion() >= 9);
+    private static final boolean BUG_JDK_8136419_FIXED =
+        (JdcTestUtils.getJavaVersion() >= 9);
     
-    private static final boolean HANDLE_WEIRD_DOLLAR_SIGN_USAGES = true;
+    private static final boolean MUST_HANDLE_WEIRD_DOLLAR_SIGN_USAGES = true;
 
     //--------------------------------------------------------------------------
     // MEMBERS
@@ -132,7 +147,7 @@ public class ClassDepsParserTest extends TestCase {
             if (apiOnly) {
             } else {
                 addSlashedName(expected, TestAnno1.class);
-                addSlashedName(expected, TestAnno2.class);
+                addSlashedName(expected, TestAnnoComplex1.class);
                 addSlashedName(expected, Object.class);
                 // String doesn't make it into the class file,
                 // only types of other arguments.
@@ -2042,16 +2057,16 @@ public class ClassDepsParserTest extends TestCase {
     @TestAnno1
     public static class MyClassVisibility_public extends RuntimeException implements Runnable {
         private static final long serialVersionUID = 1L;
-        @TestAnno1
+        @TestAnno2
         public Integer foo;
-        @TestAnno1
+        @TestAnno3
         public Integer foo() {
             return null;
         }
         @Override
-        @TestAnno1
+        @TestAnno4
         public void run() {
-            @TestAnno1
+            @TestAnno5
             Integer foo = 1;
             MyBlackHole.blackHole(foo);
         }
@@ -2059,16 +2074,16 @@ public class ClassDepsParserTest extends TestCase {
     @TestAnno1
     private static class MyClassVisibility_private extends RuntimeException implements Runnable {
         private static final long serialVersionUID = 1L;
-        @TestAnno1
+        @TestAnno2
         public Integer foo;
-        @TestAnno1
+        @TestAnno3
         public Integer foo() {
             return null;
         }
         @Override
-        @TestAnno1
+        @TestAnno4
         public void run() {
-            @TestAnno1
+            @TestAnno5
             Integer foo = 1;
             MyBlackHole.blackHole(foo);
         }
@@ -2086,6 +2101,10 @@ public class ClassDepsParserTest extends TestCase {
             if (apiOnly) {
             } else {
                 addSlashedName(expected, TestAnno1.class);
+                addSlashedName(expected, TestAnno2.class);
+                addSlashedName(expected, TestAnno3.class);
+                addSlashedName(expected, TestAnno4.class);
+                addSlashedName(expected, TestAnno5.class);
                 //
                 addSlashedName(expected, ClassDepsParserTest.class);
                 //
@@ -2108,6 +2127,10 @@ public class ClassDepsParserTest extends TestCase {
                 addSlashedName(expected, ClassDepsParserTest.class);
                 //
                 addSlashedName(expected, TestAnno1.class);
+                addSlashedName(expected, TestAnno2.class);
+                addSlashedName(expected, TestAnno3.class);
+                addSlashedName(expected, TestAnno4.class);
+                addSlashedName(expected, TestAnno5.class);
                 addSlashedName(expected, RuntimeException.class);
                 addSlashedName(expected, Runnable.class);
                 addSlashedName(expected, Integer.class);
@@ -2308,7 +2331,7 @@ public class ClassDepsParserTest extends TestCase {
      */
 
     public void test_dollarSign_$() {
-        if (!HANDLE_WEIRD_DOLLAR_SIGN_USAGES) {
+        if (!MUST_HANDLE_WEIRD_DOLLAR_SIGN_USAGES) {
             return;
         }
         
@@ -2328,7 +2351,7 @@ public class ClassDepsParserTest extends TestCase {
     }
 
     public void test_dollarSign_$$() {
-        if (!HANDLE_WEIRD_DOLLAR_SIGN_USAGES) {
+        if (!MUST_HANDLE_WEIRD_DOLLAR_SIGN_USAGES) {
             return;
         }
         
@@ -2351,7 +2374,7 @@ public class ClassDepsParserTest extends TestCase {
     }
 
     public void test_dollarSign_$_$$() {
-        if (!HANDLE_WEIRD_DOLLAR_SIGN_USAGES) {
+        if (!MUST_HANDLE_WEIRD_DOLLAR_SIGN_USAGES) {
             return;
         }
         
@@ -2371,7 +2394,7 @@ public class ClassDepsParserTest extends TestCase {
     }
 
     public void test_dollarSign_$A() {
-        if (!HANDLE_WEIRD_DOLLAR_SIGN_USAGES) {
+        if (!MUST_HANDLE_WEIRD_DOLLAR_SIGN_USAGES) {
             return;
         }
         
@@ -2386,7 +2409,7 @@ public class ClassDepsParserTest extends TestCase {
     }
 
     public void test_dollarSign_A$() {
-        if (!HANDLE_WEIRD_DOLLAR_SIGN_USAGES) {
+        if (!MUST_HANDLE_WEIRD_DOLLAR_SIGN_USAGES) {
             return;
         }
         
@@ -2401,7 +2424,7 @@ public class ClassDepsParserTest extends TestCase {
     }
 
     public void test_dollarSign_A$$B() {
-        if (!HANDLE_WEIRD_DOLLAR_SIGN_USAGES) {
+        if (!MUST_HANDLE_WEIRD_DOLLAR_SIGN_USAGES) {
             return;
         }
         
@@ -2414,7 +2437,170 @@ public class ClassDepsParserTest extends TestCase {
             computeDepsAndCheck(A$$B.class.getName(), apiOnly, expected);
         }
     }
+    
+    /*
+     * Records.
+     */
+    
+    public void test_RecordSimple() {
+        
+        for (boolean apiOnly : FALSE_TRUE) {
 
+            final SortedSet<String> expected = new TreeSet<String>();
+            //
+            addSlashedName(expected, Object.class);
+            addSlashedName(expected, Record.class);
+            addSlashedName(expected, String.class);
+            //
+            if (apiOnly) {
+            } else {
+                addRecordJavacGeneratedInternalDeps(expected);
+            }
+
+            computeDepsAndCheck(RecordSimple.class.getName(), apiOnly, expected);
+        }
+    }
+
+    public void test_RecordComplex() {
+        
+        for (boolean apiOnly : FALSE_TRUE) {
+
+            final SortedSet<String> expected = new TreeSet<String>();
+            //
+            addSlashedName(expected, Object.class);
+            addSlashedName(expected, Record.class);
+            addSlashedName(expected, String.class);
+            //
+            addSlashedName(expected, Byte.class);
+            addSlashedName(expected, Short.class);
+            addSlashedName(expected, Integer.class);
+            addSlashedName(expected, Long.class);
+            if (apiOnly) {
+            } else {
+                addRecordJavacGeneratedInternalDeps(expected);
+                //
+                addSlashedName(expected, TestAnno1.class);
+                addSlashedName(expected, TestAnno2.class);
+                addSlashedName(expected, TestAnno3.class);
+                addSlashedName(expected, TestAnno4.class);
+                addSlashedName(expected, TestAnno5.class);
+                addSlashedName(expected, Double.class);
+                addSlashedName(expected, IllegalArgumentException.class);
+            }
+
+            computeDepsAndCheck(RecordComplex.class.getName(), apiOnly, expected);
+        }
+    }
+    
+    /*
+     * Module.
+     */
+    
+    public void test_module_withMainModuleClass() {
+      
+        final String jdkBin = JdcTestConfig.getJdkHome() + "/bin";
+
+        final String compDirPath =
+            JdcTestCompHelper.ensureCompiledAndGetOutputDirPath(
+                Arrays.asList("testmodule"));
+        
+        /*
+         * Generating module-info.class in class_dir.
+         */
+        
+        if (false) {
+            final String cmd = jdkBin
+                + "/javac -cp testmodule/*; -d testmodule/class_dir"
+                + " testmodule/java_dir/module-info.java";
+            RuntimeExecHelper.execSyncNoIE(cmd, System.out);
+        }
+        
+        /*
+         * Generating test_module.jar containing
+         * a module-info.class with a "Module main class"
+         * (and a MANIFEST.MF with a "Main-Class").
+         */
+        
+        final String moduleMainClass = "net/TestModuleMain";
+        
+        if (false) {
+            final String cmd = jdkBin
+                + "/jar -c -f testmodule/jar_dir/test_module.jar"
+                + " --main-class=" + moduleMainClass + " -C testmodule/class_dir .";
+            RuntimeExecHelper.execSyncNoIE(cmd, System.out);
+        } else {
+            final String cmd = jdkBin
+                + "/jar -c -f " + compDirPath + "/test_module.jar"
+                + " --main-class=" + moduleMainClass + " -C " + compDirPath + " .";
+            RuntimeExecHelper.execSyncNoIE(cmd, System.out);
+        }
+        
+        final String moduleClassJarFilePath =
+            compDirPath + "/test_module.jar";
+        
+        /*
+         * Finding the module-info.class in the jar,
+         * and testing on it.
+         */
+        
+        final ZipFile zipFile;
+        try {
+            zipFile = new ZipFile(moduleClassJarFilePath);
+        } catch (IOException e) {
+            throw new IllegalArgumentException(e);
+        }
+        try {
+            final Enumeration<? extends ZipEntry> entries = zipFile.entries();
+            while (entries.hasMoreElements()) {
+                final ZipEntry entry = entries.nextElement();
+                if (entry.getName().equals("module-info.class")) {
+                    
+                    /*
+                     * Test loop.
+                     */
+                    
+                    for (boolean apiOnly : FALSE_TRUE) {
+
+                        final SortedSet<String> expected = new TreeSet<String>();
+                        //
+                        if (apiOnly) {
+                        } else {
+                            expected.add(moduleMainClass);
+                        }
+                        
+                        final String className = "module-info";
+                        
+                        final InputStream is;
+                        try {
+                            is = zipFile.getInputStream(entry);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        try {
+                            computeDepsAndCheck_withOptionalInputStream(
+                                is,
+                                className,
+                                apiOnly,
+                                expected);
+                        } finally {
+                            try {
+                                is.close();
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    }
+                }
+            }
+        } finally {
+            try {
+                zipFile.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+    
     /*
      * Internal treatments.
      */
@@ -2641,14 +2827,46 @@ public class ClassDepsParserTest extends TestCase {
     /*
      * 
      */
+    
+    private static void addRecordJavacGeneratedInternalDeps(
+        Collection<String> coll) {
+        addSlashedName(coll, Class.class);
+        addSlashedName(coll, MethodHandle.class);
+        addSlashedName(coll, MethodHandles.class);
+        addSlashedName(coll, MethodHandles.Lookup.class);
+        addSlashedName(coll, TypeDescriptor.class);
+        addSlashedName(coll, ObjectMethods.class);
+    }
+    
+    /*
+     * 
+     */
 
     private void computeDepsAndCheck(
-            String className,
-            boolean apiOnly,
-            SortedSet<String> expected) {
+        String className,
+        boolean apiOnly,
+        SortedSet<String> expected) {
+        final InputStream inputStream = null;
+        this.computeDepsAndCheck_withOptionalInputStream(
+            inputStream,
+            className,
+            apiOnly,
+            expected);
+    }
+
+    /**
+     * @param inputStream Can be null.
+     */
+    private void computeDepsAndCheck_withOptionalInputStream(
+        InputStream inputStream,
+        String className,
+        boolean apiOnly,
+        SortedSet<String> expected) {
 
         final SortedSet<String> actual = new TreeSet<String>();
-        final String thisClassName = computeDependencies(
+        final String thisClassName =
+            computeDependencies_withOptionalInputStream(
+                inputStream,
                 className,
                 apiOnly,
                 actual);
@@ -2673,20 +2891,48 @@ public class ClassDepsParserTest extends TestCase {
     }
 
     private static String computeDependencies(
-            String className,
-            boolean apiOnly,
-            Collection<String> jadecyDeps) {
+        String className,
+        boolean apiOnly,
+        Collection<String> jadecyDeps) {
+        final InputStream inputStream = null;
+        return computeDependencies_withOptionalInputStream(
+            inputStream,
+            className,
+            apiOnly,
+            jadecyDeps);
+    }
+    
+    /**
+     * @param inputStream Can be null.
+     * @return Parsed class name.
+     */
+    private static String computeDependencies_withOptionalInputStream(
+        InputStream inputStream,
+        String className,
+        boolean apiOnly,
+        Collection<String> jadecyDeps) {
 
         if (DEBUG) {
             System.out.println();
             System.out.println("apiOnly = " + apiOnly);
         }
 
-        final String classFilePath = getClassFilePath(className);
-        final String jadecyClassName = ClassDepsParser.computeDependencies(
-                new File(classFilePath),
+        final String classFilePath;
+        final String jadecyClassName;
+        if (inputStream != null) {
+            classFilePath = null;
+            jadecyClassName = ClassDepsParser.computeDependencies(
+                inputStream,
                 apiOnly,
                 jadecyDeps);
+        } else {
+            classFilePath = getClassFilePath(className);
+            final File classFileToParse = new File(classFilePath);
+            jadecyClassName = ClassDepsParser.computeDependencies(
+                classFileToParse,
+                apiOnly,
+                jadecyDeps);
+        }
 
         if (DEBUG) {
             System.out.println();
@@ -2695,7 +2941,7 @@ public class ClassDepsParserTest extends TestCase {
 
         // Comparing against jdeps only when debugging, for info,
         // in case it can help figuring out something.
-        if (COMPARE_WITH_JDEPS) {
+        if (MUST_COMPARE_WITH_JDEPS) {
             final JdepsHelper jdepsHelper = new JdepsHelper(
                     JDEPS,
                     COMPILATION_OUTPUT_DIR_PATH);
@@ -2712,9 +2958,9 @@ public class ClassDepsParserTest extends TestCase {
 
             System.out.println();
             if (classFilePath != null) {
-                System.out.println("classFilePath =  " + classFilePath);
+                System.out.println("classFilePath = " + classFilePath);
             }
-            System.out.println("className =  " + className);
+            System.out.println("className = " + className);
             System.out.println("jdepsClassName =  " + jdepsClassName);
             System.out.println("jadecyClassName = " + jadecyClassName);
             System.out.println("jdepsDeps =  " + jdepsDeps);
@@ -2752,21 +2998,5 @@ public class ClassDepsParserTest extends TestCase {
                 System.out.println("exceeding : (" + exceeding.size() + ") " + exceeding);
             }
         }
-    }
-    
-    /**
-     * @return 8 for 1.8.x.y, 9 for 9.x.y, etc.
-     */
-    private static int getJavaVersion() {
-        String verStr = System.getProperty("java.version");
-        if (verStr.startsWith("1.")) {
-            verStr = verStr.substring(2);
-        }
-        final int di = verStr.indexOf(".");
-        if (di > 0) {
-            verStr = verStr.substring(0, di);
-        }
-        final int ver = Integer.parseInt(verStr);
-        return ver;
     }
 }

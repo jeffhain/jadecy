@@ -40,5 +40,5 @@ import java.lang.annotation.Target;
     ElementType.MODULE,
     ElementType.RECORD_COMPONENT
 })
-public @interface TestAnno2 {
+public @interface TestAnno3 {
 }

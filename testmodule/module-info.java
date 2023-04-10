@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2023 Jeff Hain
+ * Copyright 2023 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,12 @@
  */
 
 /**
- * Package info to generate a package-info.class for test purpose.
+ * This module is quarantined in its own directory
+ * else it wreaks havoc in the IDE
+ * which assumes it's the actual module of the project
+ * (dependencies to javax.tools and junit causing compilation error).
+ * NB: That still happens whenever this file gets saved,
+ *     which needs to be followed by a project clean.
  */
-@TestAnno1
-@TestAnnoComplex1(nbrClsArr={Integer.class},tooStrong="",rounding=java.math.RoundingMode.UNNECESSARY,doc=@Documented)
-package net.jadecy.parsing.testp;
-import java.lang.annotation.Documented;
+module testmodule {
+}

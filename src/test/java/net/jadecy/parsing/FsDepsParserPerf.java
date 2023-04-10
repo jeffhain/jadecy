@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 Jeff Hain
+ * Copyright 2015-2023 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,9 +27,7 @@ public class FsDepsParserPerf {
 
     private static final int NBR_OF_RUNS = 4;
 
-    private static final String JAVA_HOME = JdcTestConfig.getJdk8Home();
-    
-    private static final String RT_JAR_FILE_PATH = JAVA_HOME + "/jre/lib/rt.jar";
+    private static final String RT_JAR_FILE_PATH = JdcTestConfig.getJdk8Home() + "/jre/lib/rt.jar";
 
     //--------------------------------------------------------------------------
     // PUBLIC METHODS

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 Jeff Hain
+ * Copyright 2015-2023 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,16 @@ public class JdcTestConfig {
     // PUBLIC METHODS
     //--------------------------------------------------------------------------
     
+    /**
+     * Used for tests compilation and jdeps.
+     */
+    public static String getJdkHome() {
+        return PROPERTIES.getProperty("JDK_HOME");
+    }
+    
+    /**
+     * Used for rt.jar, for benches.
+     */
     public static String getJdk8Home() {
         return PROPERTIES.getProperty("JDK8_HOME");
     }

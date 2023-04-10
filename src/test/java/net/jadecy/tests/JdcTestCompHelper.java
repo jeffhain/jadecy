@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 Jeff Hain
+ * Copyright 2015-2023 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,9 +30,20 @@ public class JdcTestCompHelper {
     // MEMBERS
     //--------------------------------------------------------------------------
     
-    private static final String SOURCE_VERSION = "1.8";
+    private static final int EXECUTING_JAVA_VERSION = JdcTestUtils.getJavaVersion();
     
-    private static final String TARGET_VERSION = "1.8";
+    /*
+     * Using highest possible source and target version.
+     * To change them, either change them here,
+     * or change the executing JVM.
+     */
+    
+    private static final String SOURCE_VERSION = Integer.toString(EXECUTING_JAVA_VERSION);
+    private static final String TARGET_VERSION = SOURCE_VERSION;
+    
+    /*
+     * 
+     */
     
     private static final String OUTPUT_DIR_PARENT_PATH = "test_comp";
     

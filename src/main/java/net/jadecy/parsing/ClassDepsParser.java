@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016 Jeff Hain
+ * Copyright 2015-2023 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,8 +42,9 @@ import java.util.Set;
  * - Due to class file containing possibly a lot of nested classes not
  *   actually depended on.
  * - Due to nested classes being defined in their own ".class" files.
+ * - Due to bytecode generated for records.
  * 
- * Handles class files of major version <= 52 (Java 8), and does best effort
+ * Handles class files of major version <= 64 (Java 20), and does best effort
  * if major version is higher.
  * 
  * Theoretically, we would like to consider a class to be API, and have some
@@ -65,11 +66,15 @@ import java.util.Set;
  * it depends on, up to their top level classes.
  * An API constructor of a non-static nested class causes an API dependency
  * of its class to its outer class.
+ * 
+ * Dependencies and modules:
+ * Computes dependency from a module to its main class,
+ * but not dependencies between modules (out of scope for this library).
  */
 public class ClassDepsParser {
 
     /*
-     * ".class" file format definition in jvms8.pdf, ch. 4.
+     * ".class" file format definition in jvms20.pdf, ch. 4.
      * 
      * NB:
      * The format uses "inner" word for data related to nested classes
@@ -125,8 +130,19 @@ public class ClassDepsParser {
          * value = the String
          */
         final Map<Integer,String> stringByUtf8Index = new HashMap<Integer,String>();
+        /**
+         * Must only be called after UTF8 strings of constant pool
+         * have been parsed.
+         * 
+         * @throws IllegalArgumentException if the string
+         *         has not been read from constant pool yet.
+         */
         String stringOfUtf8Index(Integer index) {
-            return this.stringByUtf8Index.get(index);
+            final String ret = this.stringByUtf8Index.get(index);
+            if (ret == null) {
+                throw new IllegalArgumentException("no value in stringByUtf8Index for key " + index);
+            }
+            return ret;
         }
         /**
          * Need for a map so that we can retrieve class name of the class, using "thisClassIndex",
@@ -135,7 +151,8 @@ public class ClassDepsParser {
          */
         final Map<Integer,Integer> classNamesUtf8IndexByClassIndex = new HashMap<Integer,Integer>();
         String classNameOfClassIndex(Integer index) {
-            return this.stringOfUtf8Index(this.classNamesUtf8IndexByClassIndex.get(index));
+            final Integer utf8Index = this.classNamesUtf8IndexByClassIndex.get(index);
+            return this.stringOfUtf8Index(utf8Index);
         }
         /*
          * Classes indexes, descriptors indexes, and signatures indexes,
@@ -190,24 +207,26 @@ public class ClassDepsParser {
      */
     private enum MyTag {
         unused_0,
-        CONSTANT_Utf8, // 1
+        CONSTANT_Utf8, // 1 (Java 1.0.2+)
         unused_2,
-        CONSTANT_Integer, // 3
-        CONSTANT_Float, // 4
-        CONSTANT_Long, // 5
-        CONSTANT_Double, // 6
-        CONSTANT_Class, // 7
-        CONSTANT_String, // 8
-        CONSTANT_Fieldref, // 9
-        CONSTANT_Methodref, // 10
-        CONSTANT_InterfaceMethodref, // 11
-        CONSTANT_NameAndType, // 12
+        CONSTANT_Integer, // 3 (Java 1.0.2+)
+        CONSTANT_Float, // 4 (Java 1.0.2+)
+        CONSTANT_Long, // 5 (Java 1.0.2+)
+        CONSTANT_Double, // 6 (Java 1.0.2+)
+        CONSTANT_Class, // 7 (Java 1.0.2+)
+        CONSTANT_String, // 8 (Java 1.0.2+)
+        CONSTANT_Fieldref, // 9 (Java 1.0.2+)
+        CONSTANT_Methodref, // 10 (Java 1.0.2+)
+        CONSTANT_InterfaceMethodref, // 11 (Java 1.0.2+)
+        CONSTANT_NameAndType, // 12 (Java 1.0.2+)
         unused_13,
         unused_14,
-        CONSTANT_MethodHandle, // 15
-        CONSTANT_MethodType, // 16
-        unused_17,
-        CONSTANT_InvokeDynamic; // 18
+        CONSTANT_MethodHandle, // 15 (Java 7+)
+        CONSTANT_MethodType, // 16 (Java 7+)
+        CONSTANT_Dynamic, // 17 (Java 11+)
+        CONSTANT_InvokeDynamic, // 18 (Java 7+)
+        CONSTANT_Module, // 19 (Java 9+)
+        CONSTANT_Package; // 20 (Java 9+)
         private static final MyTag[] VALUES = MyTag.values();
         public static MyTag valueOf(int ordinal) {
             return VALUES[ordinal];
@@ -245,15 +264,25 @@ public class ClassDepsParser {
     private static final String ATTR_RuntimeVisibleTypeAnnotations = "RuntimeVisibleTypeAnnotations";
     private static final String ATTR_RuntimeInvisibleTypeAnnotations = "RuntimeInvisibleTypeAnnotations";
     private static final String ATTR_MethodParameters = "MethodParameters";
+    private static final String ATTR_Module = "Module";
+    private static final String ATTR_ModulePackages = "ModulePackages";
+    private static final String ATTR_ModuleMainClass = "ModuleMainClass";
+    private static final String ATTR_NestHost = "NestHost";
+    private static final String ATTR_NestMembers = "NestMembers";
+    private static final String ATTR_Record = "Record";
+    private static final String ATTR_PermittedSubclasses = "PermittedSubclasses";
     
     /**
      * Java version for major versions:
-     * 48: Java 4
+     * Java 4..20 : javaVersion + 44
+     * ex.:
      * 49: Java 5
-     * 50: Java 6
-     * 51: Java 7
-     * 52: Java 8
-     * 53: Java 9 (not yet released)
+     * (...)
+     * 54: Java 10
+     * (...)
+     * 59: Java 15
+     * (...)
+     * 64: Java 20
      */
     private static final Map<String,Long> FIRST_VERSION_BY_ATTR_NAME;
     static {
@@ -281,6 +310,14 @@ public class ClassDepsParser {
         map.put(ATTR_RuntimeVisibleTypeAnnotations, classVersion(52,0));
         map.put(ATTR_RuntimeInvisibleTypeAnnotations, classVersion(52,0));
         map.put(ATTR_MethodParameters, classVersion(52,0));
+        map.put(ATTR_Module, classVersion(53,0));
+        map.put(ATTR_ModulePackages, classVersion(53,0));
+        map.put(ATTR_ModuleMainClass, classVersion(53,0));
+        map.put(ATTR_NestHost, classVersion(55,0));
+        map.put(ATTR_NestMembers, classVersion(55,0));
+        map.put(ATTR_Record, classVersion(60,0));
+        map.put(ATTR_PermittedSubclasses, classVersion(61,0));
+
         FIRST_VERSION_BY_ATTR_NAME = Collections.unmodifiableMap(map);
     }
 
@@ -701,6 +738,10 @@ public class ClassDepsParser {
         
         final long magic = getU4ElseZero(dataInput);
         if ((int)magic != 0xCAFEBABE) {
+            if (DEBUG) {
+                System.out.println();
+                System.out.println("parseClassFile : magic = 0x" + Long.toHexString(magic));
+            }
             return false;
         }
 
@@ -825,9 +866,13 @@ public class ClassDepsParser {
         // Starts at 1, but must still be inferior to count.
         for (int index = 1; index < constant_pool_count; index++) {
             final int tagOrdinal = getU1(dataInput);
+            if (tagOrdinal >= MyTag.VALUES.length) {
+                throw new RuntimeException("unknown tag : " + tagOrdinal);
+            }
+            
             final MyTag tag = MyTag.valueOf(tagOrdinal);
             if (DEBUG) {
-                System.out.println("tag = " + tag + " = " + tagOrdinal);
+                System.out.println("tag = " + tagOrdinal + " = " + tag);
             }
             switch (tag) {
             case CONSTANT_Utf8: {
@@ -836,12 +881,12 @@ public class ClassDepsParser {
                         data,
                         index);
             } break;
-
+            
             case CONSTANT_Integer:
             case CONSTANT_Float: {
                 skip(dataInput, 4);
             } break;
-
+            
             case CONSTANT_Long:
             case CONSTANT_Double: {
                 skip(dataInput, 8);
@@ -855,40 +900,47 @@ public class ClassDepsParser {
                         data,
                         index);
             } break;
-
+            
             case CONSTANT_String: {
                 skip(dataInput, 2);
             } break;
-
+            
             case CONSTANT_Fieldref:
             case CONSTANT_Methodref:
             case CONSTANT_InterfaceMethodref: {
                 skip(dataInput, 4);
             } break;
-
+            
             case CONSTANT_NameAndType: {
                 process_CONSTANT_TypeAndName(
                         dataInput,
                         data,
                         index);
             } break;
-
+            
             case CONSTANT_MethodHandle: {
                 skip(dataInput, 3);
             } break;
-                
+            
             case CONSTANT_MethodType: {
                 process_CONSTANT_MethodType(
                         dataInput,
                         data,
                         index);
             } break;
-                
+            
+            case CONSTANT_Dynamic:
             case CONSTANT_InvokeDynamic: {
                 skip(dataInput, 4);
             } break;
+            
+            case CONSTANT_Module:
+            case CONSTANT_Package: {
+                skip(dataInput, 2);
+            } break;
 
             default:
+                // Can happen, for unused_XXX enum values.
                 throw new RuntimeException("unknown tag : " + tag);
             }
         }
@@ -935,8 +987,7 @@ public class ClassDepsParser {
         
         final int descriptor_index = getU2(dataInput);
         if (DEBUG) {
-            final String descriptor = data.stringOfUtf8Index(descriptor_index);
-            System.out.println("pool[" + index + "] : descriptor (TAN) utf8 index = " + descriptor_index + " = " + descriptor);
+            System.out.println("pool[" + index + "] : descriptor (TAN) utf8 index = " + descriptor_index);
         }
         if (!data.apiOnly) {
             // Brutal add.
@@ -950,8 +1001,7 @@ public class ClassDepsParser {
             int index) {
         final int descriptor_index = getU2(dataInput);
         if (DEBUG) {
-            final String descriptor = data.stringOfUtf8Index(descriptor_index);
-            System.out.println("pool[" + index + "] : descriptor (MT) utf8 index = " + descriptor_index + " = " + descriptor);
+            System.out.println("pool[" + index + "] : descriptor (MT) utf8 index = " + descriptor_index);
         }
         if (!data.apiOnly) {
             // Brutal add.
@@ -977,8 +1027,7 @@ public class ClassDepsParser {
         
         if (DEBUG) {
             final int name_index = getU2(dataInput);
-            final String name = data.stringOfUtf8Index(name_index);
-            System.out.println("process_field_info_or_method_info : name = " + name + ", useIt = " + useIt);
+            System.out.println("name_index = " + name_index + " (useIt = " + useIt + ")");
         } else {
             // Skipping name_index [u2].
             skip(dataInput, 2);
@@ -986,8 +1035,7 @@ public class ClassDepsParser {
         
         final int descriptor_index = getU2(dataInput);
         if (DEBUG) {
-            final String descriptor = data.stringOfUtf8Index(descriptor_index);
-            System.out.println("descriptor (fOrM) utf8 index = " + descriptor_index + " = " + descriptor);
+            System.out.println("descriptor (fOrM) utf8 index = " + descriptor_index);
         }
         if (useIt) {
             addDepDescriptorIndex(data, descriptor_index);
@@ -1000,9 +1048,7 @@ public class ClassDepsParser {
                         dataInput,
                         data);
             } else {
-                skip_attribute_info(
-                        dataInput,
-                        data);
+                skip_attribute_info(dataInput);
             }
         }
     }
@@ -1012,19 +1058,24 @@ public class ClassDepsParser {
      */
 
     private static void process_attribute_info(
-            DataInput dataInput,
-            MyData data) {
+        DataInput dataInput,
+        MyData data) {
+        
         // These two are read here (common for all attributes),
         // so need not to read them again while reading attributes.
         final int attribute_name_index = getU2(dataInput);
+        if (DEBUG) {
+            System.out.println("attribute_name_index = " + attribute_name_index);
+        }
+        
         final long attribute_length = getU4(dataInput);
+        if (DEBUG) {
+            System.out.println("attribute_length = " + attribute_length);
+        }
 
         // Utf8 constants have all been read at this point,
         // so name must not be null.
         final String name = data.stringOfUtf8Index(attribute_name_index);
-        if (name == null) {
-            throw new IllegalArgumentException("no (attribute) name at Utf8 index " + attribute_name_index);
-        }
 
         final boolean isPredef = isPredefAttr(data.classVersion, name);
         
@@ -1042,14 +1093,14 @@ public class ClassDepsParser {
             // User attribute: skipping.
             
         } else if (name.equals(ATTR_Signature)) {
-            process_Signature_attribute(
+            process_Signature_attributeBody(
                     dataInput,
                     data);
             attrProcessed = true;
 
         } else if (name.equals(ATTR_InnerClasses)) {
             if (data.apiOnly) {
-                process_InnerClasses_attribute(
+                process_InnerClasses_attributeBody(
                         dataInput,
                         data);
                 attrProcessed = true;
@@ -1060,7 +1111,7 @@ public class ClassDepsParser {
         } else if (name.equals(ATTR_Exceptions)) {
             if (data.apiOnly) {
                 // Needed to detect thrown exceptions in method signatures.
-                process_Exceptions_attribute(
+                process_Exceptions_attributeBody(
                         dataInput,
                         data);
                 attrProcessed = true;
@@ -1075,7 +1126,7 @@ public class ClassDepsParser {
                 // Needed to detect class names of parameters of code annotations
                 // that make it into the class file, such as annotations of
                 // ElementType.TYPE_USE target.
-                process_Code_attribute(
+                process_Code_attributeBody(
                         dataInput,
                         data);
                 attrProcessed = true;
@@ -1118,6 +1169,41 @@ public class ClassDepsParser {
             // when parsing annotations.
             process_element_value(dataInput, data);
             attrProcessed = true;
+            
+        } else if (name.equals(ATTR_ModuleMainClass)) {
+            /*
+             * Someone might be interested in this dependency.
+             */
+            process_ModuleMainClass_attributeBody(
+                dataInput,
+                data);
+            attrProcessed = true;
+            
+        } else if (name.equals(ATTR_Record)) {
+            /*
+             * We actually don't seem to need to parse Record attribute,
+             * since it can only contain (predefined) attributes
+             * RuntimeVisibleAnnotations, RuntimeInvisibleAnnotations,
+             * RuntimeVisibleTypeAnnotations, RuntimeInvisibleTypeAnnotations,
+             * and Signature (cf. "Table 4.7-C"),
+             * all of them being already parsed aside,
+             * but we still parse the record,
+             * in case there could be an actual reason to.
+             */
+            process_Record_attributeBody(
+                dataInput,
+                data);
+            attrProcessed = true;
+            
+        } else {
+            /*
+             * Not of interest.
+             * 
+             * Not considering PermittedSubclasses
+             * as a dependency (else it would cause cycles
+             * whenever sealed classes are used,
+             * not allowing for clean cycleless code).
+             */
         }
         
         if (!attrProcessed) {
@@ -1129,15 +1215,11 @@ public class ClassDepsParser {
         }
     }
 
-    private static void skip_attribute_info(
-            DataInput dataInput,
-            MyData data) {
+    private static void skip_attribute_info(DataInput dataInput) {
         final int attribute_name_index = getU2(dataInput);
         final long attribute_length = getU4(dataInput);
-        
         if (DEBUG) {
-            final String name = data.stringOfUtf8Index(attribute_name_index);
-            System.out.println("skipping attribute : " + name);
+            System.out.println("skipping attribute : attribute_name_index = " + attribute_name_index);
         }
         // Skipping attribute.
         skip(dataInput, attribute_length);
@@ -1321,13 +1403,12 @@ public class ClassDepsParser {
         skip(dataInput, 2);
     }
     
-    private static void process_Signature_attribute(
+    private static void process_Signature_attributeBody(
             DataInput dataInput,
             MyData data) {
         final int signature_index = getU2(dataInput);
         if (DEBUG) {
-            final String signature = data.stringOfUtf8Index(signature_index);
-            System.out.println("Signature attr : signature utf8 index = " + signature_index + " = " + signature);
+            System.out.println("Signature attr : signature utf8 index = " + signature_index);
         }
         addDepSignatureIndex(data, signature_index);
     }
@@ -1341,7 +1422,7 @@ public class ClassDepsParser {
      * But if API only we still need to parse this attribute
      * to check access flags of outer classes.
      */
-    private static void process_InnerClasses_attribute(
+    private static void process_InnerClasses_attributeBody(
             DataInput dataInput,
             MyData data) {
         final int number_of_classes = getU2(dataInput);
@@ -1383,13 +1464,63 @@ public class ClassDepsParser {
         }
     }
     
+    private static void process_ModuleMainClass_attributeBody(
+        DataInput dataInput,
+        MyData data) {
+        
+        final int main_class_index = getU2(dataInput);
+        if (DEBUG) {
+            System.out.println("main_class_index = " + main_class_index);
+        }
+
+        addDepClassIndex(data, main_class_index);
+    }
+    
+    private static void process_Record_attributeBody(
+        DataInput dataInput,
+        MyData data) {
+        
+        final int components_count = getU2(dataInput);
+        if (DEBUG) {
+            System.out.println("components_count = " + components_count);
+        }
+        
+        for (int i = 0; i < components_count; i++) {
+            process_record_component_info(
+                dataInput, data);
+        }
+    }
+    
+    private static void process_record_component_info(
+        DataInput dataInput,
+        MyData data) {
+        
+        if (DEBUG) {
+            final int name_index = getU2(dataInput);
+            System.out.println("name_index = " + name_index);
+            final int descriptor_index = getU2(dataInput);
+            System.out.println("descriptor_index = " + descriptor_index);
+        } else {
+            skip(dataInput, 4);
+        }
+        
+        final int attributes_count = getU2(dataInput);
+        if (DEBUG) {
+            System.out.println("attributes_count = " + attributes_count);
+        }
+        
+        for (int i = 0; i < attributes_count; i++) {
+            process_attribute_info(dataInput, data);
+        }
+    }
+    
     /**
      * NB: Format spec says:
      * "The Exceptions attribute indicates which checked exceptions a method may throw."
      * but experimentally one can find that unchecked exceptions in throws clause
      * also appear here, and we count on it for dependencies computation of API methods.
      */
-    private static void process_Exceptions_attribute(
+    private static void process_Exceptions_attributeBody(
             DataInput dataInput,
             MyData data) {
         final int number_of_exceptions = getU2(dataInput);
@@ -1399,7 +1530,7 @@ public class ClassDepsParser {
         }
     }
     
-    private static void process_Code_attribute(
+    private static void process_Code_attributeBody(
             DataInput dataInput,
             MyData data) {
         
@@ -1446,7 +1577,7 @@ public class ClassDepsParser {
             MyData data,
             Integer classIndex) {
         if (DEBUG) {
-            System.out.println("adding dep to classIndex = " + classIndex + " (" + data.classNameOfClassIndex(classIndex) + ")");
+            System.out.println("adding dep to classIndex = " + classIndex);
         }
         data.depClassesIndexes.add(classIndex);
     }
@@ -1455,7 +1586,7 @@ public class ClassDepsParser {
             MyData data,
             Integer descriptorIndex) {
         if (DEBUG) {
-            System.out.println("adding dep to descriptorIndex = " + descriptorIndex + " (" + data.stringOfUtf8Index(descriptorIndex) + ")");
+            System.out.println("adding dep to descriptorIndex = " + descriptorIndex);
         }
         data.depDescriptorsUtf8Indexes.add(descriptorIndex);
     }
@@ -1464,7 +1595,7 @@ public class ClassDepsParser {
             MyData data,
             Integer signatureIndex) {
         if (DEBUG) {
-            System.out.println("adding dep to signatureIndex = " + signatureIndex + " (" + data.stringOfUtf8Index(signatureIndex) + ")");
+            System.out.println("adding dep to signatureIndex = " + signatureIndex);
         }
         data.depSignaturesUtf8Indexes.add(signatureIndex);
     }

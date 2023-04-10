@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Jeff Hain
+ * Copyright 2015-2023 Jeff Hain
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,12 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.math.RoundingMode;
 
 /**
- * Kept at runtime, target anywhere.
+ * Complex annotation, to check computation of dependencies from annotations,
+ * or whether dependencies to annotations parameters and defaults are detected.
  */
-@Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({
     ElementType.TYPE,
@@ -40,5 +41,9 @@ import java.lang.annotation.Target;
     ElementType.MODULE,
     ElementType.RECORD_COMPONENT
 })
-public @interface TestAnno2 {
+public @interface TestAnnoComplex1 {
+    Class<? extends Number>[] nbrClsArr() default {Byte.class};
+    String tooStrong();
+    RoundingMode rounding();
+    Documented doc();
 }
