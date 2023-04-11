@@ -54,6 +54,17 @@ import net.jadecy.parsing.testp.TestAnno4;
 import net.jadecy.parsing.testp.TestAnno5;
 import net.jadecy.parsing.testp.TestAnnoComplex1;
 import net.jadecy.parsing.testr.RecordSimple;
+import net.jadecy.parsing.tests.SeImpl1;
+import net.jadecy.parsing.tests.SeImpl2;
+import net.jadecy.parsing.tests.SeImpl2.SeImpl2NestedPub;
+import net.jadecy.parsing.tests.SeImpl21;
+import net.jadecy.parsing.tests.SeImpl22;
+import net.jadecy.parsing.tests.SeImpl23;
+import net.jadecy.parsing.tests.SeImpl3;
+import net.jadecy.parsing.tests.SeImpl4;
+import net.jadecy.parsing.tests.SeItf2;
+import net.jadecy.parsing.tests.SeItf2Impl;
+import net.jadecy.parsing.tests.SealedInterface;
 import net.jadecy.parsing.testr.RecordComplex;
 import net.jadecy.tests.JdcTestCompHelper;
 import net.jadecy.tests.JdcTestConfig;
@@ -2493,7 +2504,172 @@ public class ClassDepsParserTest extends TestCase {
     }
     
     /*
-     * Module.
+     * Sealed/permitted classes/interfaces.
+     */
+    
+    public void test_sealed_SealedInterface() {
+        
+        for (boolean apiOnly : FALSE_TRUE) {
+
+            final SortedSet<String> expected = new TreeSet<String>();
+            //
+            addSlashedName(expected, Object.class);
+            //
+            if (apiOnly) {
+            } else {
+                addSlashedName(expected, SeImpl1.class);
+                addSlashedName(expected, SeImpl2.class);
+                addSlashedName(expected, SeImpl3.class);
+                addSlashedName(expected, SeItf2.class);
+            }
+
+            computeDepsAndCheck(SealedInterface.class.getName(), apiOnly, expected);
+        }
+    }
+    
+    public void test_sealed_SeImpl1() {
+        
+        for (boolean apiOnly : FALSE_TRUE) {
+
+            final SortedSet<String> expected = new TreeSet<String>();
+            //
+            addSlashedName(expected, Object.class);
+            addSlashedName(expected, SealedInterface.class);
+
+            computeDepsAndCheck(SeImpl1.class.getName(), apiOnly, expected);
+        }
+    }
+    
+    public void test_sealed_SeImpl2() {
+        
+        final String SeImpl2NestedPpName =
+            SeImpl2NestedPub.class.getName().replaceAll("NestedPub", "NestedPp");
+
+        for (boolean apiOnly : FALSE_TRUE) {
+
+            final SortedSet<String> expected = new TreeSet<String>();
+            //
+            addSlashedName(expected, Object.class);
+            addSlashedName(expected, SealedInterface.class);
+            addSlashedName(expected, SeImpl21.class);
+            //
+            if (apiOnly) {
+            } else {
+                addSlashedName(expected, AssertionError.class);
+                addSlashedName(expected, SeImpl2NestedPub.class);
+                addSlashedName(expected, SeImpl2NestedPpName);
+                addSlashedName(expected, SeImpl22.class);
+                addSlashedName(expected, SeImpl23.class);
+            }
+
+            computeDepsAndCheck(SeImpl2.class.getName(), apiOnly, expected);
+        }
+    }
+    
+    public void test_sealed_SeImpl2NestedPub() {
+        
+        for (boolean apiOnly : FALSE_TRUE) {
+
+            final SortedSet<String> expected = new TreeSet<String>();
+            //
+            addSlashedName(expected, SeImpl2.class);
+
+            computeDepsAndCheck(SeImpl2NestedPub.class.getName(), apiOnly, expected);
+        }
+    }
+    
+    public void test_sealed_SeImpl2NestedPp() {
+        
+        final String SeImpl2NestedPpName =
+            SeImpl2NestedPub.class.getName().replaceAll("NestedPub", "NestedPp");
+        
+        for (boolean apiOnly : FALSE_TRUE) {
+
+            final SortedSet<String> expected = new TreeSet<String>();
+            //
+            if (apiOnly) {
+                // No an API class, so no API-only dependency.
+            } else {
+                addSlashedName(expected, SeImpl2.class);
+            }
+
+            computeDepsAndCheck(SeImpl2NestedPpName, apiOnly, expected);
+        }
+    }
+    
+    /**
+     * Same for SeImpl22 and SeImpl23.
+     */
+    public void test_sealed_SeImpl21() {
+        
+        for (boolean apiOnly : FALSE_TRUE) {
+
+            final SortedSet<String> expected = new TreeSet<String>();
+            //
+            addSlashedName(expected, SeImpl2.class);
+
+            computeDepsAndCheck(SeImpl21.class.getName(), apiOnly, expected);
+        }
+    }
+    
+    public void test_sealed_SeImpl3() {
+        
+        for (boolean apiOnly : FALSE_TRUE) {
+
+            final SortedSet<String> expected = new TreeSet<String>();
+            //
+            addSlashedName(expected, Object.class);
+            addSlashedName(expected, SealedInterface.class);
+
+            computeDepsAndCheck(SeImpl3.class.getName(), apiOnly, expected);
+        }
+    }
+    
+    public void test_sealed_SeImpl4() {
+        
+        for (boolean apiOnly : FALSE_TRUE) {
+
+            final SortedSet<String> expected = new TreeSet<String>();
+            //
+            addSlashedName(expected, SeImpl3.class);
+
+            computeDepsAndCheck(SeImpl4.class.getName(), apiOnly, expected);
+        }
+    }
+    
+    public void test_sealed_SeItf2() {
+        
+        for (boolean apiOnly : FALSE_TRUE) {
+
+            final SortedSet<String> expected = new TreeSet<String>();
+            //
+            addSlashedName(expected, Object.class);
+            addSlashedName(expected, SealedInterface.class);
+            //
+            if (apiOnly) {
+            } else {
+                addSlashedName(expected, SeItf2Impl.class);
+            }
+
+            computeDepsAndCheck(SeItf2.class.getName(), apiOnly, expected);
+        }
+    }
+    
+    public void test_sealed_SeItf2Impl() {
+        
+        for (boolean apiOnly : FALSE_TRUE) {
+
+            final SortedSet<String> expected = new TreeSet<String>();
+            //
+            addSlashedName(expected, Object.class);
+            addSlashedName(expected, SeItf2.class);
+
+            computeDepsAndCheck(SeItf2Impl.class.getName(), apiOnly, expected);
+        }
+    }
+    
+    /*
+     * Modules.
      */
     
     public void test_module_withMainModuleClass() {
@@ -2505,17 +2681,6 @@ public class ClassDepsParserTest extends TestCase {
                 Arrays.asList("testmodule"));
         
         /*
-         * Generating module-info.class in class_dir.
-         */
-        
-        if (false) {
-            final String cmd = jdkBin
-                + "/javac -cp testmodule/*; -d testmodule/class_dir"
-                + " testmodule/java_dir/module-info.java";
-            RuntimeExecHelper.execSyncNoIE(cmd, System.out);
-        }
-        
-        /*
          * Generating test_module.jar containing
          * a module-info.class with a "Module main class"
          * (and a MANIFEST.MF with a "Main-Class").
@@ -2523,17 +2688,10 @@ public class ClassDepsParserTest extends TestCase {
         
         final String moduleMainClass = "net/TestModuleMain";
         
-        if (false) {
-            final String cmd = jdkBin
-                + "/jar -c -f testmodule/jar_dir/test_module.jar"
-                + " --main-class=" + moduleMainClass + " -C testmodule/class_dir .";
-            RuntimeExecHelper.execSyncNoIE(cmd, System.out);
-        } else {
-            final String cmd = jdkBin
-                + "/jar -c -f " + compDirPath + "/test_module.jar"
-                + " --main-class=" + moduleMainClass + " -C " + compDirPath + " .";
-            RuntimeExecHelper.execSyncNoIE(cmd, System.out);
-        }
+        final String cmd = jdkBin
+            + "/jar -c -f " + compDirPath + "/test_module.jar"
+            + " --main-class=" + moduleMainClass + " -C " + compDirPath + " .";
+        RuntimeExecHelper.execSyncNoIE(cmd, System.out);
         
         final String moduleClassJarFilePath =
             compDirPath + "/test_module.jar";

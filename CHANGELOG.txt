@@ -1,4 +1,14 @@
 ################################################################################
+Jadecy x.x.x, xxxx/xx/xx
+
+- Added javadoc clarification about dependencies to permitted subclasses,
+  and added corresponding tests.
+  Permitted subclasses are an API dependency if they appear in the API
+  elsewhere than following "permits" (that is, they are not an API dependency
+  just because of being permitted subclasses),
+  and are a non-API dependency always.
+
+################################################################################
 Jadecy 2.1.0, 2023/04/10
 
 - Upgraded supported class file format from 52 (Java 8) to 64 (Java 20)

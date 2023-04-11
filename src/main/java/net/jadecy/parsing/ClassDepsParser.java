@@ -67,6 +67,12 @@ import java.util.Set;
  * An API constructor of a non-static nested class causes an API dependency
  * of its class to its outer class.
  * 
+ * Dependencies and permitted subclasses:
+ * Permitted subclasses are an API dependency if they appear in the API
+ * elsewhere than following "permits" (that is, they are not an API dependency
+ * just because of being permitted subclasses),
+ * and are a non-API dependency always.
+ * 
  * Dependencies and modules:
  * Computes dependency from a module to its main class,
  * but not dependencies between modules (out of scope for this library).
@@ -1199,10 +1205,16 @@ public class ClassDepsParser {
             /*
              * Not of interest.
              * 
-             * Not considering PermittedSubclasses
-             * as a dependency (else it would cause cycles
-             * whenever sealed classes are used,
-             * not allowing for clean cycleless code).
+             * No need to parse PermittedSubclasses attribute:
+             * - If apiOnly is true, permitted subclasses
+             *   will be considered a dependency only if they appear
+             *   in the API elsewhere than following "permits".
+             *   This allows for clean code not to have cycles
+             *   in API dependencies whenever it defines sealed classes.
+             * - If apiOnly is false, permitted subclasses
+             *   will always be considered a dependency (from brutal add).
+             *   Not doing so would require to check for their eventual
+             *   use in all class code, which would not be worth it.
              */
         }
         
